@@ -1,0 +1,3081 @@
+{
+  "prefill_steps": 0,
+  "prefill_cumulative_log_likelihood": [
+    0.0
+  ],
+  "prefill_history": [],
+  "step_history": [
+    {
+      "step": 1,
+      "delta_log_likelihood": [
+        -0.08984375
+      ],
+      "cumulative_log_likelihood": [
+        -0.08984375
+      ],
+      "positions": [
+        [
+          127
+        ]
+      ],
+      "tokens": [
+        [
+          126081
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.08984375
+        ]
+      ]
+    },
+    {
+      "step": 2,
+      "delta_log_likelihood": [
+        -0.2275390625
+      ],
+      "cumulative_log_likelihood": [
+        -0.3173828125
+      ],
+      "positions": [
+        [
+          126
+        ]
+      ],
+      "tokens": [
+        [
+          126348
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.2275390625
+        ]
+      ]
+    },
+    {
+      "step": 3,
+      "delta_log_likelihood": [
+        -0.09423828125
+      ],
+      "cumulative_log_likelihood": [
+        -0.41162109375
+      ],
+      "positions": [
+        [
+          125
+        ]
+      ],
+      "tokens": [
+        [
+          13
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.09423828125
+        ]
+      ]
+    },
+    {
+      "step": 4,
+      "delta_log_likelihood": [
+        -0.111328125
+      ],
+      "cumulative_log_likelihood": [
+        -0.52294921875
+      ],
+      "positions": [
+        [
+          123
+        ]
+      ],
+      "tokens": [
+        [
+          23
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.111328125
+        ]
+      ]
+    },
+    {
+      "step": 5,
+      "delta_log_likelihood": [
+        -0.0157470703125
+      ],
+      "cumulative_log_likelihood": [
+        -0.5386962890625
+      ],
+      "positions": [
+        [
+          122
+        ]
+      ],
+      "tokens": [
+        [
+          220
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.0157470703125
+        ]
+      ]
+    },
+    {
+      "step": 6,
+      "delta_log_likelihood": [
+        -0.0157470703125
+      ],
+      "cumulative_log_likelihood": [
+        -0.554443359375
+      ],
+      "positions": [
+        [
+          124
+        ]
+      ],
+      "tokens": [
+        [
+          3871
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.0157470703125
+        ]
+      ]
+    },
+    {
+      "step": 7,
+      "delta_log_likelihood": [
+        -0.039794921875
+      ],
+      "cumulative_log_likelihood": [
+        -0.59423828125
+      ],
+      "positions": [
+        [
+          121
+        ]
+      ],
+      "tokens": [
+        [
+          296
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.039794921875
+        ]
+      ]
+    },
+    {
+      "step": 8,
+      "delta_log_likelihood": [
+        -0.03173828125
+      ],
+      "cumulative_log_likelihood": [
+        -0.6259765625
+      ],
+      "positions": [
+        [
+          120
+        ]
+      ],
+      "tokens": [
+        [
+          44137
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.03173828125
+        ]
+      ]
+    },
+    {
+      "step": 9,
+      "delta_log_likelihood": [
+        -0.05615234375
+      ],
+      "cumulative_log_likelihood": [
+        -0.68212890625
+      ],
+      "positions": [
+        [
+          117
+        ]
+      ],
+      "tokens": [
+        [
+          220
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.05615234375
+        ]
+      ]
+    },
+    {
+      "step": 10,
+      "delta_log_likelihood": [
+        -0.41015625
+      ],
+      "cumulative_log_likelihood": [
+        -1.09228515625
+      ],
+      "positions": [
+        [
+          115
+        ]
+      ],
+      "tokens": [
+        [
+          560
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.41015625
+        ]
+      ]
+    },
+    {
+      "step": 11,
+      "delta_log_likelihood": [
+        -0.00390625
+      ],
+      "cumulative_log_likelihood": [
+        -1.09619140625
+      ],
+      "positions": [
+        [
+          116
+        ]
+      ],
+      "tokens": [
+        [
+          2001
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.00390625
+        ]
+      ]
+    },
+    {
+      "step": 12,
+      "delta_log_likelihood": [
+        -0.064453125
+      ],
+      "cumulative_log_likelihood": [
+        -1.16064453125
+      ],
+      "positions": [
+        [
+          113
+        ]
+      ],
+      "tokens": [
+        [
+          11
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.064453125
+        ]
+      ]
+    },
+    {
+      "step": 13,
+      "delta_log_likelihood": [
+        -0.07275390625
+      ],
+      "cumulative_log_likelihood": [
+        -1.2333984375
+      ],
+      "positions": [
+        [
+          114
+        ]
+      ],
+      "tokens": [
+        [
+          29693
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.07275390625
+        ]
+      ]
+    },
+    {
+      "step": 14,
+      "delta_log_likelihood": [
+        -0.302734375
+      ],
+      "cumulative_log_likelihood": [
+        -1.5361328125
+      ],
+      "positions": [
+        [
+          110
+        ]
+      ],
+      "tokens": [
+        [
+          198
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.302734375
+        ]
+      ]
+    },
+    {
+      "step": 15,
+      "delta_log_likelihood": [
+        -0.06884765625
+      ],
+      "cumulative_log_likelihood": [
+        -1.60498046875
+      ],
+      "positions": [
+        [
+          119
+        ]
+      ],
+      "tokens": [
+        [
+          17
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.06884765625
+        ]
+      ]
+    },
+    {
+      "step": 16,
+      "delta_log_likelihood": [
+        -0.08544921875
+      ],
+      "cumulative_log_likelihood": [
+        -1.6904296875
+      ],
+      "positions": [
+        [
+          111
+        ]
+      ],
+      "tokens": [
+        [
+          198
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.08544921875
+        ]
+      ]
+    },
+    {
+      "step": 17,
+      "delta_log_likelihood": [
+        -0.203125
+      ],
+      "cumulative_log_likelihood": [
+        -1.8935546875
+      ],
+      "positions": [
+        [
+          118
+        ]
+      ],
+      "tokens": [
+        [
+          22
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.203125
+        ]
+      ]
+    },
+    {
+      "step": 18,
+      "delta_log_likelihood": [
+        -0.3203125
+      ],
+      "cumulative_log_likelihood": [
+        -2.2138671875
+      ],
+      "positions": [
+        [
+          112
+        ]
+      ],
+      "tokens": [
+        [
+          22884
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.3203125
+        ]
+      ]
+    },
+    {
+      "step": 19,
+      "delta_log_likelihood": [
+        -0.625
+      ],
+      "cumulative_log_likelihood": [
+        -2.8388671875
+      ],
+      "positions": [
+        [
+          108
+        ]
+      ],
+      "tokens": [
+        [
+          44137
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.625
+        ]
+      ]
+    },
+    {
+      "step": 20,
+      "delta_log_likelihood": [
+        -0.035888671875
+      ],
+      "cumulative_log_likelihood": [
+        -2.874755859375
+      ],
+      "positions": [
+        [
+          105
+        ]
+      ],
+      "tokens": [
+        [
+          220
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.035888671875
+        ]
+      ]
+    },
+    {
+      "step": 21,
+      "delta_log_likelihood": [
+        -0.00390625
+      ],
+      "cumulative_log_likelihood": [
+        -2.878662109375
+      ],
+      "positions": [
+        [
+          107
+        ]
+      ],
+      "tokens": [
+        [
+          17
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.00390625
+        ]
+      ]
+    },
+    {
+      "step": 22,
+      "delta_log_likelihood": [
+        0.0
+      ],
+      "cumulative_log_likelihood": [
+        -2.878662109375
+      ],
+      "positions": [
+        [
+          106
+        ]
+      ],
+      "tokens": [
+        [
+          22
+        ]
+      ],
+      "token_log_probs": [
+        [
+          0.0
+        ]
+      ]
+    },
+    {
+      "step": 23,
+      "delta_log_likelihood": [
+        -0.0277099609375
+      ],
+      "cumulative_log_likelihood": [
+        -2.9063720703125
+      ],
+      "positions": [
+        [
+          104
+        ]
+      ],
+      "tokens": [
+        [
+          373
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.0277099609375
+        ]
+      ]
+    },
+    {
+      "step": 24,
+      "delta_log_likelihood": [
+        -0.039794921875
+      ],
+      "cumulative_log_likelihood": [
+        -2.9461669921875
+      ],
+      "positions": [
+        [
+          109
+        ]
+      ],
+      "tokens": [
+        [
+          13
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.039794921875
+        ]
+      ]
+    },
+    {
+      "step": 25,
+      "delta_log_likelihood": [
+        -0.58984375
+      ],
+      "cumulative_log_likelihood": [
+        -3.5360107421875
+      ],
+      "positions": [
+        [
+          102
+        ]
+      ],
+      "tokens": [
+        [
+          17
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.58984375
+        ]
+      ]
+    },
+    {
+      "step": 26,
+      "delta_log_likelihood": [
+        -0.142578125
+      ],
+      "cumulative_log_likelihood": [
+        -3.6785888671875
+      ],
+      "positions": [
+        [
+          101
+        ]
+      ],
+      "tokens": [
+        [
+          220
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.142578125
+        ]
+      ]
+    },
+    {
+      "step": 27,
+      "delta_log_likelihood": [
+        0.0
+      ],
+      "cumulative_log_likelihood": [
+        -3.6785888671875
+      ],
+      "positions": [
+        [
+          100
+        ]
+      ],
+      "tokens": [
+        [
+          781
+        ]
+      ],
+      "token_log_probs": [
+        [
+          0.0
+        ]
+      ]
+    },
+    {
+      "step": 28,
+      "delta_log_likelihood": [
+        0.0
+      ],
+      "cumulative_log_likelihood": [
+        -3.6785888671875
+      ],
+      "positions": [
+        [
+          103
+        ]
+      ],
+      "tokens": [
+        [
+          19
+        ]
+      ],
+      "token_log_probs": [
+        [
+          0.0
+        ]
+      ]
+    },
+    {
+      "step": 29,
+      "delta_log_likelihood": [
+        -0.06884765625
+      ],
+      "cumulative_log_likelihood": [
+        -3.7474365234375
+      ],
+      "positions": [
+        [
+          98
+        ]
+      ],
+      "tokens": [
+        [
+          19
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.06884765625
+        ]
+      ]
+    },
+    {
+      "step": 30,
+      "delta_log_likelihood": [
+        -0.00390625
+      ],
+      "cumulative_log_likelihood": [
+        -3.7513427734375
+      ],
+      "positions": [
+        [
+          99
+        ]
+      ],
+      "tokens": [
+        [
+          23
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.00390625
+        ]
+      ]
+    },
+    {
+      "step": 31,
+      "delta_log_likelihood": [
+        -0.142578125
+      ],
+      "cumulative_log_likelihood": [
+        -3.8939208984375
+      ],
+      "positions": [
+        [
+          97
+        ]
+      ],
+      "tokens": [
+        [
+          220
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.142578125
+        ]
+      ]
+    },
+    {
+      "step": 32,
+      "delta_log_likelihood": [
+        -0.8828125
+      ],
+      "cumulative_log_likelihood": [
+        -4.7767333984375
+      ],
+      "positions": [
+        [
+          96
+        ]
+      ],
+      "tokens": [
+        [
+          25
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.8828125
+        ]
+      ]
+    },
+    {
+      "step": 33,
+      "delta_log_likelihood": [
+        -1.0859375
+      ],
+      "cumulative_log_likelihood": [
+        -5.8626708984375
+      ],
+      "positions": [
+        [
+          94
+        ]
+      ],
+      "tokens": [
+        [
+          1946
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -1.0859375
+        ]
+      ]
+    },
+    {
+      "step": 34,
+      "delta_log_likelihood": [
+        -0.212890625
+      ],
+      "cumulative_log_likelihood": [
+        -6.0755615234375
+      ],
+      "positions": [
+        [
+          91
+        ]
+      ],
+      "tokens": [
+        [
+          268
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.212890625
+        ]
+      ]
+    },
+    {
+      "step": 35,
+      "delta_log_likelihood": [
+        -0.06884765625
+      ],
+      "cumulative_log_likelihood": [
+        -6.1444091796875
+      ],
+      "positions": [
+        [
+          93
+        ]
+      ],
+      "tokens": [
+        [
+          546
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.06884765625
+        ]
+      ]
+    },
+    {
+      "step": 36,
+      "delta_log_likelihood": [
+        -0.060302734375
+      ],
+      "cumulative_log_likelihood": [
+        -6.2047119140625
+      ],
+      "positions": [
+        [
+          92
+        ]
+      ],
+      "tokens": [
+        [
+          28202
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.060302734375
+        ]
+      ]
+    },
+    {
+      "step": 37,
+      "delta_log_likelihood": [
+        -0.734375
+      ],
+      "cumulative_log_likelihood": [
+        -6.9390869140625
+      ],
+      "positions": [
+        [
+          87
+        ]
+      ],
+      "tokens": [
+        [
+          198
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.734375
+        ]
+      ]
+    },
+    {
+      "step": 38,
+      "delta_log_likelihood": [
+        -0.302734375
+      ],
+      "cumulative_log_likelihood": [
+        -7.2418212890625
+      ],
+      "positions": [
+        [
+          84
+        ]
+      ],
+      "tokens": [
+        [
+          44137
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.302734375
+        ]
+      ]
+    },
+    {
+      "step": 39,
+      "delta_log_likelihood": [
+        -0.00390625
+      ],
+      "cumulative_log_likelihood": [
+        -7.2457275390625
+      ],
+      "positions": [
+        [
+          82
+        ]
+      ],
+      "tokens": [
+        [
+          17
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.00390625
+        ]
+      ]
+    },
+    {
+      "step": 40,
+      "delta_log_likelihood": [
+        0.0
+      ],
+      "cumulative_log_likelihood": [
+        -7.2457275390625
+      ],
+      "positions": [
+        [
+          81
+        ]
+      ],
+      "tokens": [
+        [
+          220
+        ]
+      ],
+      "token_log_probs": [
+        [
+          0.0
+        ]
+      ]
+    },
+    {
+      "step": 41,
+      "delta_log_likelihood": [
+        0.0
+      ],
+      "cumulative_log_likelihood": [
+        -7.2457275390625
+      ],
+      "positions": [
+        [
+          83
+        ]
+      ],
+      "tokens": [
+        [
+          19
+        ]
+      ],
+      "token_log_probs": [
+        [
+          0.0
+        ]
+      ]
+    },
+    {
+      "step": 42,
+      "delta_log_likelihood": [
+        -0.0157470703125
+      ],
+      "cumulative_log_likelihood": [
+        -7.261474609375
+      ],
+      "positions": [
+        [
+          86
+        ]
+      ],
+      "tokens": [
+        [
+          198
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.0157470703125
+        ]
+      ]
+    },
+    {
+      "step": 43,
+      "delta_log_likelihood": [
+        -0.019775390625
+      ],
+      "cumulative_log_likelihood": [
+        -7.28125
+      ],
+      "positions": [
+        [
+          80
+        ]
+      ],
+      "tokens": [
+        [
+          373
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.019775390625
+        ]
+      ]
+    },
+    {
+      "step": 44,
+      "delta_log_likelihood": [
+        -0.0157470703125
+      ],
+      "cumulative_log_likelihood": [
+        -7.2969970703125
+      ],
+      "positions": [
+        [
+          85
+        ]
+      ],
+      "tokens": [
+        [
+          13
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.0157470703125
+        ]
+      ]
+    },
+    {
+      "step": 45,
+      "delta_log_likelihood": [
+        -0.41015625
+      ],
+      "cumulative_log_likelihood": [
+        -7.7071533203125
+      ],
+      "positions": [
+        [
+          78
+        ]
+      ],
+      "tokens": [
+        [
+          220
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.41015625
+        ]
+      ]
+    },
+    {
+      "step": 46,
+      "delta_log_likelihood": [
+        -0.048095703125
+      ],
+      "cumulative_log_likelihood": [
+        -7.7552490234375
+      ],
+      "positions": [
+        [
+          79
+        ]
+      ],
+      "tokens": [
+        [
+          19
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.048095703125
+        ]
+      ]
+    },
+    {
+      "step": 47,
+      "delta_log_likelihood": [
+        -0.03173828125
+      ],
+      "cumulative_log_likelihood": [
+        -7.7869873046875
+      ],
+      "positions": [
+        [
+          75
+        ]
+      ],
+      "tokens": [
+        [
+          220
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.03173828125
+        ]
+      ]
+    },
+    {
+      "step": 48,
+      "delta_log_likelihood": [
+        -0.00787353515625
+      ],
+      "cumulative_log_likelihood": [
+        -7.79486083984375
+      ],
+      "positions": [
+        [
+          76
+        ]
+      ],
+      "tokens": [
+        [
+          21
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.00787353515625
+        ]
+      ]
+    },
+    {
+      "step": 49,
+      "delta_log_likelihood": [
+        -0.1650390625
+      ],
+      "cumulative_log_likelihood": [
+        -7.95989990234375
+      ],
+      "positions": [
+        [
+          77
+        ]
+      ],
+      "tokens": [
+        [
+          500
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.1650390625
+        ]
+      ]
+    },
+    {
+      "step": 50,
+      "delta_log_likelihood": [
+        -0.4765625
+      ],
+      "cumulative_log_likelihood": [
+        -8.43646240234375
+      ],
+      "positions": [
+        [
+          90
+        ]
+      ],
+      "tokens": [
+        [
+          1088
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.4765625
+        ]
+      ]
+    },
+    {
+      "step": 51,
+      "delta_log_likelihood": [
+        -0.039794921875
+      ],
+      "cumulative_log_likelihood": [
+        -8.47625732421875
+      ],
+      "positions": [
+        [
+          89
+        ]
+      ],
+      "tokens": [
+        [
+          11
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.039794921875
+        ]
+      ]
+    },
+    {
+      "step": 52,
+      "delta_log_likelihood": [
+        -0.421875
+      ],
+      "cumulative_log_likelihood": [
+        -8.89813232421875
+      ],
+      "positions": [
+        [
+          88
+        ]
+      ],
+      "tokens": [
+        [
+          6301
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.421875
+        ]
+      ]
+    },
+    {
+      "step": 53,
+      "delta_log_likelihood": [
+        -0.57421875
+      ],
+      "cumulative_log_likelihood": [
+        -9.47235107421875
+      ],
+      "positions": [
+        [
+          0
+        ]
+      ],
+      "tokens": [
+        [
+          7534
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.57421875
+        ]
+      ]
+    },
+    {
+      "step": 54,
+      "delta_log_likelihood": [
+        -0.00787353515625
+      ],
+      "cumulative_log_likelihood": [
+        -9.480224609375
+      ],
+      "positions": [
+        [
+          1
+        ]
+      ],
+      "tokens": [
+        [
+          11
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.00787353515625
+        ]
+      ]
+    },
+    {
+      "step": 55,
+      "delta_log_likelihood": [
+        -0.1982421875
+      ],
+      "cumulative_log_likelihood": [
+        -9.678466796875
+      ],
+      "positions": [
+        [
+          2
+        ]
+      ],
+      "tokens": [
+        [
+          13125
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.1982421875
+        ]
+      ]
+    },
+    {
+      "step": 56,
+      "delta_log_likelihood": [
+        -0.10693359375
+      ],
+      "cumulative_log_likelihood": [
+        -9.785400390625
+      ],
+      "positions": [
+        [
+          4
+        ]
+      ],
+      "tokens": [
+        [
+          7118
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.10693359375
+        ]
+      ]
+    },
+    {
+      "step": 57,
+      "delta_log_likelihood": [
+        0.0
+      ],
+      "cumulative_log_likelihood": [
+        -9.785400390625
+      ],
+      "positions": [
+        [
+          3
+        ]
+      ],
+      "tokens": [
+        [
+          268
+        ]
+      ],
+      "token_log_probs": [
+        [
+          0.0
+        ]
+      ]
+    },
+    {
+      "step": 58,
+      "delta_log_likelihood": [
+        -0.283203125
+      ],
+      "cumulative_log_likelihood": [
+        -10.068603515625
+      ],
+      "positions": [
+        [
+          6
+        ]
+      ],
+      "tokens": [
+        [
+          9660
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.283203125
+        ]
+      ]
+    },
+    {
+      "step": 59,
+      "delta_log_likelihood": [
+        -0.283203125
+      ],
+      "cumulative_log_likelihood": [
+        -10.351806640625
+      ],
+      "positions": [
+        [
+          5
+        ]
+      ],
+      "tokens": [
+        [
+          29693
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.283203125
+        ]
+      ]
+    },
+    {
+      "step": 60,
+      "delta_log_likelihood": [
+        -0.625
+      ],
+      "cumulative_log_likelihood": [
+        -10.976806640625
+      ],
+      "positions": [
+        [
+          9
+        ]
+      ],
+      "tokens": [
+        [
+          1218
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.625
+        ]
+      ]
+    },
+    {
+      "step": 61,
+      "delta_log_likelihood": [
+        -0.023681640625
+      ],
+      "cumulative_log_likelihood": [
+        -11.00048828125
+      ],
+      "positions": [
+        [
+          8
+        ]
+      ],
+      "tokens": [
+        [
+          268
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.023681640625
+        ]
+      ]
+    },
+    {
+      "step": 62,
+      "delta_log_likelihood": [
+        -0.1650390625
+      ],
+      "cumulative_log_likelihood": [
+        -11.16552734375
+      ],
+      "positions": [
+        [
+          7
+        ]
+      ],
+      "tokens": [
+        [
+          296
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.1650390625
+        ]
+      ]
+    },
+    {
+      "step": 63,
+      "delta_log_likelihood": [
+        -0.38671875
+      ],
+      "cumulative_log_likelihood": [
+        -11.55224609375
+      ],
+      "positions": [
+        [
+          12
+        ]
+      ],
+      "tokens": [
+        [
+          3871
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.38671875
+        ]
+      ]
+    },
+    {
+      "step": 64,
+      "delta_log_likelihood": [
+        0.0
+      ],
+      "cumulative_log_likelihood": [
+        -11.55224609375
+      ],
+      "positions": [
+        [
+          10
+        ]
+      ],
+      "tokens": [
+        [
+          220
+        ]
+      ],
+      "token_log_probs": [
+        [
+          0.0
+        ]
+      ]
+    },
+    {
+      "step": 65,
+      "delta_log_likelihood": [
+        -0.00390625
+      ],
+      "cumulative_log_likelihood": [
+        -11.55615234375
+      ],
+      "positions": [
+        [
+          11
+        ]
+      ],
+      "tokens": [
+        [
+          19
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.00390625
+        ]
+      ]
+    },
+    {
+      "step": 66,
+      "delta_log_likelihood": [
+        -0.369140625
+      ],
+      "cumulative_log_likelihood": [
+        -11.92529296875
+      ],
+      "positions": [
+        [
+          95
+        ]
+      ],
+      "tokens": [
+        [
+          16742
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.369140625
+        ]
+      ]
+    },
+    {
+      "step": 67,
+      "delta_log_likelihood": [
+        -0.9921875
+      ],
+      "cumulative_log_likelihood": [
+        -12.91748046875
+      ],
+      "positions": [
+        [
+          13
+        ]
+      ],
+      "tokens": [
+        [
+          13
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.9921875
+        ]
+      ]
+    },
+    {
+      "step": 68,
+      "delta_log_likelihood": [
+        -0.6484375
+      ],
+      "cumulative_log_likelihood": [
+        -13.56591796875
+      ],
+      "positions": [
+        [
+          43
+        ]
+      ],
+      "tokens": [
+        [
+          198
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.6484375
+        ]
+      ]
+    },
+    {
+      "step": 69,
+      "delta_log_likelihood": [
+        -0.03173828125
+      ],
+      "cumulative_log_likelihood": [
+        -13.59765625
+      ],
+      "positions": [
+        [
+          47
+        ]
+      ],
+      "tokens": [
+        [
+          13125
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.03173828125
+        ]
+      ]
+    },
+    {
+      "step": 70,
+      "delta_log_likelihood": [
+        0.0
+      ],
+      "cumulative_log_likelihood": [
+        -13.59765625
+      ],
+      "positions": [
+        [
+          44
+        ]
+      ],
+      "tokens": [
+        [
+          198
+        ]
+      ],
+      "token_log_probs": [
+        [
+          0.0
+        ]
+      ]
+    },
+    {
+      "step": 71,
+      "delta_log_likelihood": [
+        0.0
+      ],
+      "cumulative_log_likelihood": [
+        -13.59765625
+      ],
+      "positions": [
+        [
+          46
+        ]
+      ],
+      "tokens": [
+        [
+          11
+        ]
+      ],
+      "token_log_probs": [
+        [
+          0.0
+        ]
+      ]
+    },
+    {
+      "step": 72,
+      "delta_log_likelihood": [
+        0.0
+      ],
+      "cumulative_log_likelihood": [
+        -13.59765625
+      ],
+      "positions": [
+        [
+          48
+        ]
+      ],
+      "tokens": [
+        [
+          268
+        ]
+      ],
+      "token_log_probs": [
+        [
+          0.0
+        ]
+      ]
+    },
+    {
+      "step": 73,
+      "delta_log_likelihood": [
+        0.0
+      ],
+      "cumulative_log_likelihood": [
+        -13.59765625
+      ],
+      "positions": [
+        [
+          49
+        ]
+      ],
+      "tokens": [
+        [
+          7118
+        ]
+      ],
+      "token_log_probs": [
+        [
+          0.0
+        ]
+      ]
+    },
+    {
+      "step": 74,
+      "delta_log_likelihood": [
+        -0.00390625
+      ],
+      "cumulative_log_likelihood": [
+        -13.6015625
+      ],
+      "positions": [
+        [
+          51
+        ]
+      ],
+      "tokens": [
+        [
+          9660
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.00390625
+        ]
+      ]
+    },
+    {
+      "step": 75,
+      "delta_log_likelihood": [
+        0.0
+      ],
+      "cumulative_log_likelihood": [
+        -13.6015625
+      ],
+      "positions": [
+        [
+          53
+        ]
+      ],
+      "tokens": [
+        [
+          268
+        ]
+      ],
+      "token_log_probs": [
+        [
+          0.0
+        ]
+      ]
+    },
+    {
+      "step": 76,
+      "delta_log_likelihood": [
+        -0.00787353515625
+      ],
+      "cumulative_log_likelihood": [
+        -13.60943603515625
+      ],
+      "positions": [
+        [
+          31
+        ]
+      ],
+      "tokens": [
+        [
+          220
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.00787353515625
+        ]
+      ]
+    },
+    {
+      "step": 77,
+      "delta_log_likelihood": [
+        0.0
+      ],
+      "cumulative_log_likelihood": [
+        -13.60943603515625
+      ],
+      "positions": [
+        [
+          32
+        ]
+      ],
+      "tokens": [
+        [
+          16
+        ]
+      ],
+      "token_log_probs": [
+        [
+          0.0
+        ]
+      ]
+    },
+    {
+      "step": 78,
+      "delta_log_likelihood": [
+        0.0
+      ],
+      "cumulative_log_likelihood": [
+        -13.60943603515625
+      ],
+      "positions": [
+        [
+          33
+        ]
+      ],
+      "tokens": [
+        [
+          17
+        ]
+      ],
+      "token_log_probs": [
+        [
+          0.0
+        ]
+      ]
+    },
+    {
+      "step": 79,
+      "delta_log_likelihood": [
+        0.0
+      ],
+      "cumulative_log_likelihood": [
+        -13.60943603515625
+      ],
+      "positions": [
+        [
+          34
+        ]
+      ],
+      "tokens": [
+        [
+          500
+        ]
+      ],
+      "token_log_probs": [
+        [
+          0.0
+        ]
+      ]
+    },
+    {
+      "step": 80,
+      "delta_log_likelihood": [
+        0.0
+      ],
+      "cumulative_log_likelihood": [
+        -13.60943603515625
+      ],
+      "positions": [
+        [
+          35
+        ]
+      ],
+      "tokens": [
+        [
+          220
+        ]
+      ],
+      "token_log_probs": [
+        [
+          0.0
+        ]
+      ]
+    },
+    {
+      "step": 81,
+      "delta_log_likelihood": [
+        0.0
+      ],
+      "cumulative_log_likelihood": [
+        -13.60943603515625
+      ],
+      "positions": [
+        [
+          36
+        ]
+      ],
+      "tokens": [
+        [
+          19
+        ]
+      ],
+      "token_log_probs": [
+        [
+          0.0
+        ]
+      ]
+    },
+    {
+      "step": 82,
+      "delta_log_likelihood": [
+        0.0
+      ],
+      "cumulative_log_likelihood": [
+        -13.60943603515625
+      ],
+      "positions": [
+        [
+          37
+        ]
+      ],
+      "tokens": [
+        [
+          373
+        ]
+      ],
+      "token_log_probs": [
+        [
+          0.0
+        ]
+      ]
+    },
+    {
+      "step": 83,
+      "delta_log_likelihood": [
+        0.0
+      ],
+      "cumulative_log_likelihood": [
+        -13.60943603515625
+      ],
+      "positions": [
+        [
+          38
+        ]
+      ],
+      "tokens": [
+        [
+          220
+        ]
+      ],
+      "token_log_probs": [
+        [
+          0.0
+        ]
+      ]
+    },
+    {
+      "step": 84,
+      "delta_log_likelihood": [
+        0.0
+      ],
+      "cumulative_log_likelihood": [
+        -13.60943603515625
+      ],
+      "positions": [
+        [
+          39
+        ]
+      ],
+      "tokens": [
+        [
+          19
+        ]
+      ],
+      "token_log_probs": [
+        [
+          0.0
+        ]
+      ]
+    },
+    {
+      "step": 85,
+      "delta_log_likelihood": [
+        0.0
+      ],
+      "cumulative_log_likelihood": [
+        -13.60943603515625
+      ],
+      "positions": [
+        [
+          40
+        ]
+      ],
+      "tokens": [
+        [
+          23
+        ]
+      ],
+      "token_log_probs": [
+        [
+          0.0
+        ]
+      ]
+    },
+    {
+      "step": 86,
+      "delta_log_likelihood": [
+        0.0
+      ],
+      "cumulative_log_likelihood": [
+        -13.60943603515625
+      ],
+      "positions": [
+        [
+          41
+        ]
+      ],
+      "tokens": [
+        [
+          44137
+        ]
+      ],
+      "token_log_probs": [
+        [
+          0.0
+        ]
+      ]
+    },
+    {
+      "step": 87,
+      "delta_log_likelihood": [
+        0.0
+      ],
+      "cumulative_log_likelihood": [
+        -13.60943603515625
+      ],
+      "positions": [
+        [
+          42
+        ]
+      ],
+      "tokens": [
+        [
+          13
+        ]
+      ],
+      "token_log_probs": [
+        [
+          0.0
+        ]
+      ]
+    },
+    {
+      "step": 88,
+      "delta_log_likelihood": [
+        -0.00390625
+      ],
+      "cumulative_log_likelihood": [
+        -13.61334228515625
+      ],
+      "positions": [
+        [
+          56
+        ]
+      ],
+      "tokens": [
+        [
+          19
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.00390625
+        ]
+      ]
+    },
+    {
+      "step": 89,
+      "delta_log_likelihood": [
+        0.0
+      ],
+      "cumulative_log_likelihood": [
+        -13.61334228515625
+      ],
+      "positions": [
+        [
+          55
+        ]
+      ],
+      "tokens": [
+        [
+          220
+        ]
+      ],
+      "token_log_probs": [
+        [
+          0.0
+        ]
+      ]
+    },
+    {
+      "step": 90,
+      "delta_log_likelihood": [
+        0.0
+      ],
+      "cumulative_log_likelihood": [
+        -13.61334228515625
+      ],
+      "positions": [
+        [
+          57
+        ]
+      ],
+      "tokens": [
+        [
+          3871
+        ]
+      ],
+      "token_log_probs": [
+        [
+          0.0
+        ]
+      ]
+    },
+    {
+      "step": 91,
+      "delta_log_likelihood": [
+        -0.00390625
+      ],
+      "cumulative_log_likelihood": [
+        -13.61724853515625
+      ],
+      "positions": [
+        [
+          52
+        ]
+      ],
+      "tokens": [
+        [
+          296
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.00390625
+        ]
+      ]
+    },
+    {
+      "step": 92,
+      "delta_log_likelihood": [
+        -0.0439453125
+      ],
+      "cumulative_log_likelihood": [
+        -13.66119384765625
+      ],
+      "positions": [
+        [
+          58
+        ]
+      ],
+      "tokens": [
+        [
+          13
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.0439453125
+        ]
+      ]
+    },
+    {
+      "step": 93,
+      "delta_log_likelihood": [
+        -0.142578125
+      ],
+      "cumulative_log_likelihood": [
+        -13.80377197265625
+      ],
+      "positions": [
+        [
+          45
+        ]
+      ],
+      "tokens": [
+        [
+          7324
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.142578125
+        ]
+      ]
+    },
+    {
+      "step": 94,
+      "delta_log_likelihood": [
+        -0.3515625
+      ],
+      "cumulative_log_likelihood": [
+        -14.15533447265625
+      ],
+      "positions": [
+        [
+          50
+        ]
+      ],
+      "tokens": [
+        [
+          29693
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.3515625
+        ]
+      ]
+    },
+    {
+      "step": 95,
+      "delta_log_likelihood": [
+        -0.462890625
+      ],
+      "cumulative_log_likelihood": [
+        -14.61822509765625
+      ],
+      "positions": [
+        [
+          54
+        ]
+      ],
+      "tokens": [
+        [
+          2338
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.462890625
+        ]
+      ]
+    },
+    {
+      "step": 96,
+      "delta_log_likelihood": [
+        -0.58203125
+      ],
+      "cumulative_log_likelihood": [
+        -15.20025634765625
+      ],
+      "positions": [
+        [
+          21
+        ]
+      ],
+      "tokens": [
+        [
+          854
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.58203125
+        ]
+      ]
+    },
+    {
+      "step": 97,
+      "delta_log_likelihood": [
+        0.0
+      ],
+      "cumulative_log_likelihood": [
+        -15.20025634765625
+      ],
+      "positions": [
+        [
+          17
+        ]
+      ],
+      "tokens": [
+        [
+          220
+        ]
+      ],
+      "token_log_probs": [
+        [
+          0.0
+        ]
+      ]
+    },
+    {
+      "step": 98,
+      "delta_log_likelihood": [
+        0.0
+      ],
+      "cumulative_log_likelihood": [
+        -15.20025634765625
+      ],
+      "positions": [
+        [
+          18
+        ]
+      ],
+      "tokens": [
+        [
+          16
+        ]
+      ],
+      "token_log_probs": [
+        [
+          0.0
+        ]
+      ]
+    },
+    {
+      "step": 99,
+      "delta_log_likelihood": [
+        0.0
+      ],
+      "cumulative_log_likelihood": [
+        -15.20025634765625
+      ],
+      "positions": [
+        [
+          19
+        ]
+      ],
+      "tokens": [
+        [
+          17
+        ]
+      ],
+      "token_log_probs": [
+        [
+          0.0
+        ]
+      ]
+    },
+    {
+      "step": 100,
+      "delta_log_likelihood": [
+        0.0
+      ],
+      "cumulative_log_likelihood": [
+        -15.20025634765625
+      ],
+      "positions": [
+        [
+          22
+        ]
+      ],
+      "tokens": [
+        [
+          6984
+        ]
+      ],
+      "token_log_probs": [
+        [
+          0.0
+        ]
+      ]
+    },
+    {
+      "step": 101,
+      "delta_log_likelihood": [
+        -0.01177978515625
+      ],
+      "cumulative_log_likelihood": [
+        -15.2120361328125
+      ],
+      "positions": [
+        [
+          65
+        ]
+      ],
+      "tokens": [
+        [
+          854
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.01177978515625
+        ]
+      ]
+    },
+    {
+      "step": 102,
+      "delta_log_likelihood": [
+        0.0
+      ],
+      "cumulative_log_likelihood": [
+        -15.2120361328125
+      ],
+      "positions": [
+        [
+          62
+        ]
+      ],
+      "tokens": [
+        [
+          220
+        ]
+      ],
+      "token_log_probs": [
+        [
+          0.0
+        ]
+      ]
+    },
+    {
+      "step": 103,
+      "delta_log_likelihood": [
+        0.0
+      ],
+      "cumulative_log_likelihood": [
+        -15.2120361328125
+      ],
+      "positions": [
+        [
+          63
+        ]
+      ],
+      "tokens": [
+        [
+          21
+        ]
+      ],
+      "token_log_probs": [
+        [
+          0.0
+        ]
+      ]
+    },
+    {
+      "step": 104,
+      "delta_log_likelihood": [
+        0.0
+      ],
+      "cumulative_log_likelihood": [
+        -15.2120361328125
+      ],
+      "positions": [
+        [
+          66
+        ]
+      ],
+      "tokens": [
+        [
+          6984
+        ]
+      ],
+      "token_log_probs": [
+        [
+          0.0
+        ]
+      ]
+    },
+    {
+      "step": 105,
+      "delta_log_likelihood": [
+        -0.019775390625
+      ],
+      "cumulative_log_likelihood": [
+        -15.2318115234375
+      ],
+      "positions": [
+        [
+          64
+        ]
+      ],
+      "tokens": [
+        [
+          44137
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.019775390625
+        ]
+      ]
+    },
+    {
+      "step": 106,
+      "delta_log_likelihood": [
+        -0.00390625
+      ],
+      "cumulative_log_likelihood": [
+        -15.2357177734375
+      ],
+      "positions": [
+        [
+          20
+        ]
+      ],
+      "tokens": [
+        [
+          44137
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.00390625
+        ]
+      ]
+    },
+    {
+      "step": 107,
+      "delta_log_likelihood": [
+        -0.3359375
+      ],
+      "cumulative_log_likelihood": [
+        -15.5716552734375
+      ],
+      "positions": [
+        [
+          24
+        ]
+      ],
+      "tokens": [
+        [
+          220
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.3359375
+        ]
+      ]
+    },
+    {
+      "step": 108,
+      "delta_log_likelihood": [
+        0.0
+      ],
+      "cumulative_log_likelihood": [
+        -15.5716552734375
+      ],
+      "positions": [
+        [
+          25
+        ]
+      ],
+      "tokens": [
+        [
+          19
+        ]
+      ],
+      "token_log_probs": [
+        [
+          0.0
+        ]
+      ]
+    },
+    {
+      "step": 109,
+      "delta_log_likelihood": [
+        0.0
+      ],
+      "cumulative_log_likelihood": [
+        -15.5716552734375
+      ],
+      "positions": [
+        [
+          26
+        ]
+      ],
+      "tokens": [
+        [
+          3871
+        ]
+      ],
+      "token_log_probs": [
+        [
+          0.0
+        ]
+      ]
+    },
+    {
+      "step": 110,
+      "delta_log_likelihood": [
+        0.0
+      ],
+      "cumulative_log_likelihood": [
+        -15.5716552734375
+      ],
+      "positions": [
+        [
+          68
+        ]
+      ],
+      "tokens": [
+        [
+          220
+        ]
+      ],
+      "token_log_probs": [
+        [
+          0.0
+        ]
+      ]
+    },
+    {
+      "step": 111,
+      "delta_log_likelihood": [
+        0.0
+      ],
+      "cumulative_log_likelihood": [
+        -15.5716552734375
+      ],
+      "positions": [
+        [
+          69
+        ]
+      ],
+      "tokens": [
+        [
+          19
+        ]
+      ],
+      "token_log_probs": [
+        [
+          0.0
+        ]
+      ]
+    },
+    {
+      "step": 112,
+      "delta_log_likelihood": [
+        0.0
+      ],
+      "cumulative_log_likelihood": [
+        -15.5716552734375
+      ],
+      "positions": [
+        [
+          70
+        ]
+      ],
+      "tokens": [
+        [
+          3871
+        ]
+      ],
+      "token_log_probs": [
+        [
+          0.0
+        ]
+      ]
+    },
+    {
+      "step": 113,
+      "delta_log_likelihood": [
+        -0.00390625
+      ],
+      "cumulative_log_likelihood": [
+        -15.5755615234375
+      ],
+      "positions": [
+        [
+          67
+        ]
+      ],
+      "tokens": [
+        [
+          352
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.00390625
+        ]
+      ]
+    },
+    {
+      "step": 114,
+      "delta_log_likelihood": [
+        0.0
+      ],
+      "cumulative_log_likelihood": [
+        -15.5755615234375
+      ],
+      "positions": [
+        [
+          23
+        ]
+      ],
+      "tokens": [
+        [
+          352
+        ]
+      ],
+      "token_log_probs": [
+        [
+          0.0
+        ]
+      ]
+    },
+    {
+      "step": 115,
+      "delta_log_likelihood": [
+        -0.023681640625
+      ],
+      "cumulative_log_likelihood": [
+        -15.5992431640625
+      ],
+      "positions": [
+        [
+          71
+        ]
+      ],
+      "tokens": [
+        [
+          11
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.023681640625
+        ]
+      ]
+    },
+    {
+      "step": 116,
+      "delta_log_likelihood": [
+        0.0
+      ],
+      "cumulative_log_likelihood": [
+        -15.5992431640625
+      ],
+      "positions": [
+        [
+          27
+        ]
+      ],
+      "tokens": [
+        [
+          11
+        ]
+      ],
+      "token_log_probs": [
+        [
+          0.0
+        ]
+      ]
+    },
+    {
+      "step": 117,
+      "delta_log_likelihood": [
+        -0.404296875
+      ],
+      "cumulative_log_likelihood": [
+        -16.0035400390625
+      ],
+      "positions": [
+        [
+          14
+        ]
+      ],
+      "tokens": [
+        [
+          7100
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.404296875
+        ]
+      ]
+    },
+    {
+      "step": 118,
+      "delta_log_likelihood": [
+        0.0
+      ],
+      "cumulative_log_likelihood": [
+        -16.0035400390625
+      ],
+      "positions": [
+        [
+          16
+        ]
+      ],
+      "tokens": [
+        [
+          9660
+        ]
+      ],
+      "token_log_probs": [
+        [
+          0.0
+        ]
+      ]
+    },
+    {
+      "step": 119,
+      "delta_log_likelihood": [
+        -0.00390625
+      ],
+      "cumulative_log_likelihood": [
+        -16.0074462890625
+      ],
+      "positions": [
+        [
+          61
+        ]
+      ],
+      "tokens": [
+        [
+          9660
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.00390625
+        ]
+      ]
+    },
+    {
+      "step": 120,
+      "delta_log_likelihood": [
+        -0.01177978515625
+      ],
+      "cumulative_log_likelihood": [
+        -16.01922607421875
+      ],
+      "positions": [
+        [
+          15
+        ]
+      ],
+      "tokens": [
+        [
+          1285
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.01177978515625
+        ]
+      ]
+    },
+    {
+      "step": 121,
+      "delta_log_likelihood": [
+        -0.00390625
+      ],
+      "cumulative_log_likelihood": [
+        -16.02313232421875
+      ],
+      "positions": [
+        [
+          60
+        ]
+      ],
+      "tokens": [
+        [
+          1285
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.00390625
+        ]
+      ]
+    },
+    {
+      "step": 122,
+      "delta_log_likelihood": [
+        -0.0157470703125
+      ],
+      "cumulative_log_likelihood": [
+        -16.03887939453125
+      ],
+      "positions": [
+        [
+          59
+        ]
+      ],
+      "tokens": [
+        [
+          7100
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.0157470703125
+        ]
+      ]
+    },
+    {
+      "step": 123,
+      "delta_log_likelihood": [
+        -0.2216796875
+      ],
+      "cumulative_log_likelihood": [
+        -16.26055908203125
+      ],
+      "positions": [
+        [
+          29
+        ]
+      ],
+      "tokens": [
+        [
+          7118
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.2216796875
+        ]
+      ]
+    },
+    {
+      "step": 124,
+      "delta_log_likelihood": [
+        0.0
+      ],
+      "cumulative_log_likelihood": [
+        -16.26055908203125
+      ],
+      "positions": [
+        [
+          73
+        ]
+      ],
+      "tokens": [
+        [
+          7118
+        ]
+      ],
+      "token_log_probs": [
+        [
+          0.0
+        ]
+      ]
+    },
+    {
+      "step": 125,
+      "delta_log_likelihood": [
+        -0.01177978515625
+      ],
+      "cumulative_log_likelihood": [
+        -16.2723388671875
+      ],
+      "positions": [
+        [
+          74
+        ]
+      ],
+      "tokens": [
+        [
+          341
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.01177978515625
+        ]
+      ]
+    },
+    {
+      "step": 126,
+      "delta_log_likelihood": [
+        0.0
+      ],
+      "cumulative_log_likelihood": [
+        -16.2723388671875
+      ],
+      "positions": [
+        [
+          30
+        ]
+      ],
+      "tokens": [
+        [
+          341
+        ]
+      ],
+      "token_log_probs": [
+        [
+          0.0
+        ]
+      ]
+    },
+    {
+      "step": 127,
+      "delta_log_likelihood": [
+        -0.1650390625
+      ],
+      "cumulative_log_likelihood": [
+        -16.4373779296875
+      ],
+      "positions": [
+        [
+          28
+        ]
+      ],
+      "tokens": [
+        [
+          268
+        ]
+      ],
+      "token_log_probs": [
+        [
+          -0.1650390625
+        ]
+      ]
+    },
+    {
+      "step": 128,
+      "delta_log_likelihood": [
+        0.0
+      ],
+      "cumulative_log_likelihood": [
+        -16.4373779296875
+      ],
+      "positions": [
+        [
+          72
+        ]
+      ],
+      "tokens": [
+        [
+          268
+        ]
+      ],
+      "token_log_probs": [
+        [
+          0.0
+        ]
+      ]
+    }
+  ]
+}

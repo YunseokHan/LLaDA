@@ -1,0 +1,45 @@
+method,k,pass_at_k
+ar,1,0.8
+ar,2,0.87
+ar,4,0.91
+ar,8,0.92
+ar,16,0.96
+ar,32,0.97
+ar,64,0.97
+ar,128,0.98
+ar,256,0.98
+ar,512,0.98
+ar,1024,0.99
+confidence,1,0.55
+confidence,2,0.55
+confidence,4,0.55
+confidence,8,0.55
+confidence,16,0.55
+confidence,32,0.55
+confidence,64,0.55
+confidence,128,0.55
+confidence,256,0.55
+confidence,512,0.55
+confidence,1024,0.55
+random,1,0.52
+random,2,0.68
+random,4,0.78
+random,8,0.85
+random,16,0.9
+random,32,0.94
+random,64,0.96
+random,128,0.97
+random,256,0.97
+random,512,0.97
+random,1024,1.0
+semi_ar (16),1,0.79
+semi_ar (16),2,0.86
+semi_ar (16),4,0.91
+semi_ar (16),8,0.94
+semi_ar (16),16,0.96
+semi_ar (16),32,0.98
+semi_ar (16),64,0.98
+semi_ar (16),128,0.98
+semi_ar (16),256,0.99
+semi_ar (16),512,0.99
+semi_ar (16),1024,1.0
