@@ -43,6 +43,20 @@ def normalize_method_label(label: str | None, block_hint: int | None = None) -> 
         return format_method_label("semi_ar", block)
     return label
 
+def method_matches(label: str | None, query: str | None) -> bool:
+    if not label or not query:
+        return False
+    label = label.strip()
+    query = query.strip()
+    if not label or not query:
+        return False
+    if label == query:
+        return True
+    if "(" not in query:
+        base = query
+        return label == base or label.startswith(f"{base} ")
+    return False
+
 def method_tag_from_label(label: str) -> str:
     block = block_size_from_label(label)
     if block is not None:
@@ -126,7 +140,7 @@ def main():
     ap.add_argument("--seed", type=int, default=1234)
     ap.add_argument("--dpi", type=int, default=200)
     ap.add_argument("--method", type=str, default=None,
-                    help="Filter success permutations by method (e.g., random).")
+                    help="Filter success permutations by method (e.g., random, margin, halton).")
     ap.add_argument("--semi_ar_block_size", type=int, default=None,
                     help="Specify block size when --method semi_ar to disambiguate.")
     args = ap.parse_args()
@@ -139,7 +153,7 @@ def main():
     if args.method and method_filter is None:
         raise ValueError(f"Unable to interpret --method value: {args.method}")
     if method_filter:
-        items = [obj for obj in items if obj.get("method") == method_filter]
+        items = [obj for obj in items if method_matches(obj.get("method"), method_filter)]
     print(f"[INFO] loaded {total_items} success entries, {len(items)} after filtering")
 
     need = args.num_row * args.num_row

@@ -50,6 +50,20 @@ def normalize_method_label(label: str | None, block_hint: int | None = None) -> 
         return format_method_label("semi_ar", block)
     return label
 
+def method_matches(label: str | None, query: str | None) -> bool:
+    if not label or not query:
+        return False
+    label = label.strip()
+    query = query.strip()
+    if not label or not query:
+        return False
+    if label == query:
+        return True
+    if "(" not in query:
+        base = query
+        return label == base or label.startswith(f"{base} ")
+    return False
+
 def method_tag_from_label(label: str) -> str:
     block = block_size_from_label(label)
     if block is not None:
@@ -165,16 +179,17 @@ def plot_histograms(df: pd.DataFrame, metric: str, status: str, out_pdf: str, ou
     plt.close()
     return True
 
-def method_filter_set(methods: List[str] | None, semi_ar_block_size: int | None) -> set[str] | None:
+def method_filter_set(methods: List[str] | None, semi_ar_block_size: int | None) -> List[str] | None:
     if not methods:
         return None
-    normalized = set()
+    normalized: List[str] = []
     for m in methods:
         block_hint = semi_ar_block_size if m.strip().startswith("semi_ar") else None
         norm = normalize_method_label(m, block_hint)
         if norm is None:
             raise ValueError(f"Unable to interpret method name: {m}")
-        normalized.add(norm)
+        if norm not in normalized:
+            normalized.append(norm)
     return normalized
 
 def main():
@@ -186,7 +201,7 @@ def main():
     ap.add_argument("--final_out_dir", type=str, default=None,
                     help="Directory to write plots (default: sibling final/).")
     ap.add_argument("--methods", nargs="*", default=None,
-                    help="Optional list of methods to include (e.g., confidence random \"semi_ar (16)\").")
+                    help="Optional list of methods to include (e.g., confidence random margin \"semi_ar (16)\" halton).")
     ap.add_argument("--semi_ar_block_size", type=int, default=None,
                     help="Block size hint used when filtering with method 'semi_ar'.")
     ap.add_argument("--csv_name", type=str, default="perm_ar_similarity_metrics.csv",
@@ -208,7 +223,7 @@ def main():
 
     method_filters = method_filter_set(args.methods, args.semi_ar_block_size)
     if method_filters:
-        items = [obj for obj in items if obj.get("method") in method_filters]
+        items = [obj for obj in items if any(method_matches(obj.get("method"), mf) for mf in method_filters)]
         if not items:
             raise ValueError("No success permutations left after method filtering.")
 

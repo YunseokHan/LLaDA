@@ -32,6 +32,7 @@ CFG=0.0
 SEED=1234
 OUT_DIR="$RAW_DIR"
 SEMI_AR_BLOCKS="${SEMI_AR_BLOCKS:-8}"  # space-separated list
+HALTON_EXTRA_ARGS="${HALTON_EXTRA_ARGS:-}"  # extra CLI args for halton method
 
 SAFE_MODEL="${MODEL//\//_}"
 WANDB_GROUP="${WANDB_GROUP:-passk-${SAFE_MODEL}}"
@@ -51,7 +52,8 @@ while [[ $# -gt 0 ]]; do
     -h|--help)
       cat <<'USAGE'
 Usage: bash scripts/test_ordering.sh [--gpus ID0,ID1,...] [method ...]
-  methods: any of ar, random, semi_ar, confidence (default: semi_ar confidence)
+  methods: any of ar, random, semi_ar, confidence, margin, halton (default: semi_ar confidence)
+  For halton, you can supply HALTON_EXTRA_ARGS="--halton_steps 80 --halton_randomize" to tweak decoding.
 USAGE
       exit 0
       ;;
@@ -179,8 +181,19 @@ for raw_method in "${METHOD_ARGS[@]}"; do
     confidence)
       run_method_sharded confidence --save_success_perms --save_failed_perms
       ;;
+    margin)
+      run_method_sharded margin --save_success_perms --save_failed_perms
+      ;;
+    halton)
+      halton_extra=()
+      if [[ -n "$HALTON_EXTRA_ARGS" ]]; then
+        # shellcheck disable=SC2206
+        halton_extra=($HALTON_EXTRA_ARGS)
+      fi
+      run_method_sharded halton --save_success_perms --save_failed_perms "${halton_extra[@]}"
+      ;;
     *)
-      echo "[ERR] Unknown method '$raw_method'. Supported: ar, random, semi_ar, confidence." >&2
+      echo "[ERR] Unknown method '$raw_method'. Supported: ar, random, semi_ar, confidence, margin, halton." >&2
       exit 1
       ;;
   esac

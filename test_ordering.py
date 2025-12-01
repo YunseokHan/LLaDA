@@ -158,6 +158,95 @@ def generate_k_per_step_with_perm(
 
         return x
 
+def generate_halton_decoding(
+    model,
+    prompt_ids: torch.Tensor,
+    attention_mask: torch.Tensor,
+    gen_length: int,
+    halton_steps: int,
+    cfg_scale: float = 0.0,
+    block_eos: bool = False,
+    device: str = "cuda",
+    temp_min: float = 1.0,
+    temp_max: float = 1.0,
+    temp_pow: float = 1.0,
+    temp_warmup: int = 0,
+    top_k: int = -1,
+    randomize: bool = False,
+    sched_pow: float = 1.0,
+    nb_point: int = 10_000,
+):
+    if torch is None:
+        raise RuntimeError("PyTorch is required to run decoding.")
+    with torch.no_grad():
+        B, Lp = prompt_ids.shape
+        steps = max(1, halton_steps)
+        x = torch.full((B, Lp + gen_length), MASK_TOKEN_ID, dtype=torch.long, device=device)
+        x[:, :Lp] = prompt_ids
+        attn = torch.cat(
+            [attention_mask, torch.ones((B, gen_length), dtype=attention_mask.dtype, device=device)],
+            dim=-1
+        ) if attention_mask is not None else None
+
+        base_order = torch.from_numpy(halton_order_for_length(gen_length, nb_point)).to(device=device)
+        order = base_order.clone().unsqueeze(0).expand(B, -1).clone()
+        if randomize:
+            shifts = torch.randint(0, gen_length, (B,), device=device)
+            for b in range(B):
+                order[b] = torch.roll(order[b], int(shifts[b].item()))
+
+        temperatures = torch.linspace(temp_min, temp_max, steps=steps, dtype=torch.float32, device=device)
+        decode_orders: List[List[int]] = [[] for _ in range(B)]
+        prev_target = 0
+        start = Lp
+
+        for step_idx in range(steps):
+            if prev_target >= gen_length:
+                break
+            target = halton_schedule_target(step_idx, steps, gen_length, sched_pow=sched_pow)
+            if step_idx == steps - 1:
+                target = gen_length
+            target = max(target, prev_target + 1)
+            target = min(target, gen_length)
+            rel_pos = order[:, prev_target:target]
+            chunk = rel_pos.size(1)
+            if chunk <= 0:
+                continue
+
+            logits = forward_logits(model, x, attn, cfg_scale=cfg_scale).float()
+            abs_pos = rel_pos + start
+            if block_eos:
+                batch_idx = torch.arange(B, device=device).unsqueeze(1)
+                logits[batch_idx, abs_pos, EOS_TOKEN_ID] = -torch.inf
+                logits[batch_idx, abs_pos, EOT_TOKEN_ID] = -torch.inf
+
+            batch_idx = torch.arange(B, device=device).unsqueeze(1)
+            step_logits = logits[batch_idx, abs_pos, :]  # (B, chunk, V)
+            temp_scale = float(temperatures[min(step_idx, temperatures.size(0) - 1)].item())
+            temp_scale = max(temp_scale, 1e-5)
+            temp_scale = temp_scale ** temp_pow
+            if step_idx < temp_warmup:
+                temp_scale *= 0.5
+            scaled_logits = step_logits * temp_scale
+            probs = torch.softmax(scaled_logits, dim=-1)
+
+            if top_k > 0 and top_k < probs.size(-1):
+                topk_prob, topk_idx = torch.topk(probs, k=top_k, dim=-1)
+                topk_prob = topk_prob / torch.clamp(topk_prob.sum(dim=-1, keepdim=True), min=1e-9)
+                sampled = torch.distributions.Categorical(topk_prob.view(-1, top_k)).sample()
+                pred = topk_idx.view(-1, top_k).gather(1, sampled.unsqueeze(-1))
+                pred = pred.view(B, chunk)
+            else:
+                flat_probs = probs.view(-1, probs.size(-1))
+                sampled = torch.distributions.Categorical(flat_probs).sample()
+                pred = sampled.view(B, chunk)
+
+            x[batch_idx, abs_pos] = pred
+            for b in range(B):
+                decode_orders[b].extend([int(v) for v in rel_pos[b].tolist()])
+            prev_target = target
+
+        return x, decode_orders
 def generate_confidence_decoding(
     model,
     prompt_ids: torch.Tensor,
@@ -215,6 +304,69 @@ def generate_confidence_decoding(
 
         return x, decode_order
 
+def generate_margin_decoding(
+    model,
+    prompt_ids: torch.Tensor,
+    attention_mask: torch.Tensor,
+    gen_length: int,
+    cfg_scale: float = 0.0,
+    block_eos: bool = False,
+    device: str = "cuda",
+):
+    """
+    Decode tokens by selecting the mask position with the largest top-probability margin.
+    """
+    if torch is None:
+        raise RuntimeError("PyTorch is required to run decoding.")
+    with torch.no_grad():
+        B, Lp = prompt_ids.shape
+        if B != 1:
+            raise ValueError("margin decoding expects batch size 1 per call.")
+
+        x = torch.full((B, Lp + gen_length), MASK_TOKEN_ID, dtype=torch.long, device=device)
+        x[:, :Lp] = prompt_ids
+        attn = torch.cat(
+            [attention_mask, torch.ones((B, gen_length), dtype=attention_mask.dtype, device=device)],
+            dim=-1
+        ) if attention_mask is not None else None
+
+        start = Lp
+        remaining = list(range(gen_length))
+        decode_order: List[int] = []
+
+        while remaining:
+            logits = forward_logits(model, x, attn, cfg_scale=cfg_scale)
+            if block_eos:
+                for rel_pos in remaining:
+                    abs_pos = start + rel_pos
+                    logits[:, abs_pos, EOS_TOKEN_ID] = -torch.inf
+                    logits[:, abs_pos, EOT_TOKEN_ID] = -torch.inf
+
+            margins = []
+            best_tokens = []
+            for rel_pos in remaining:
+                abs_pos = start + rel_pos
+                pos_logits = logits[:, abs_pos, :]
+                probs = torch.softmax(pos_logits, dim=-1)
+                k = min(2, probs.size(-1))
+                topk_probs, topk_idx = torch.topk(probs, k=k, dim=-1)
+                if k == 1:
+                    diff = topk_probs[:, 0]
+                else:
+                    diff = torch.abs(topk_probs[:, 0] - topk_probs[:, 1])
+                margins.append(diff.squeeze(0))
+                best_tokens.append(topk_idx[:, 0].squeeze(0))
+
+            margin_tensor = torch.stack(margins)  # (num_remaining,)
+            best_idx = int(torch.argmax(margin_tensor).item())
+            chosen_rel = remaining.pop(best_idx)
+            chosen_abs = start + chosen_rel
+            chosen_token = best_tokens[best_idx]
+            x[0, chosen_abs] = chosen_token
+            decode_order.append(int(chosen_rel))
+
+        return x, decode_order
+
 def decode_generated_only(tokenizer, full_ids: torch.Tensor, prompt_len: int) -> List[str]:
     return tokenizer.batch_decode(full_ids[:, prompt_len:], skip_special_tokens=True)
 
@@ -243,15 +395,99 @@ def perm_for_trial_blockwise(gen_length: int, trial_idx: int, seed_base: int, pr
         rng.shuffle(p[start:end])
     return p
 
-def format_method_label(method: str, semi_ar_block_size: int = None) -> str:
+_HALTON_ORDER_CACHE: Dict[Tuple[int, int], np.ndarray] = {}
+
+def _halton_sequence(base: int, n_sample: int) -> np.ndarray:
+    """
+    Generate a 1D Halton sequence.
+    """
+    seq = np.zeros(n_sample, dtype=np.float64)
+    for i in range(n_sample):
+        f = 1.0
+        r = 0.0
+        idx = i + 1
+        while idx > 0:
+            f /= base
+            r += f * (idx % base)
+            idx //= base
+        seq[i] = r
+    return seq
+
+def build_halton_order_1d(length: int, nb_point: int = 10_000) -> np.ndarray:
+    """
+    Build a Halton-based ordering over [0, length).
+    """
+    if length <= 0:
+        return np.zeros(0, dtype=np.int64)
+    nb_point = max(nb_point, length * 2)
+    halton_vals = _halton_sequence(2, nb_point)
+    order = np.floor(halton_vals * length).astype(np.int64)
+    uniq_index = np.unique(order, return_index=True)[1]
+    order = order[np.sort(uniq_index)]
+    if order.size < length:
+        # Append any missing indices in increasing order for determinism.
+        missing = sorted(set(range(length)) - set(order.tolist()))
+        order = np.concatenate([order, np.asarray(missing, dtype=np.int64)])
+    return order[:length]
+
+def halton_order_for_length(length: int, nb_point: int = 10_000) -> np.ndarray:
+    key = (length, nb_point)
+    if key not in _HALTON_ORDER_CACHE:
+        _HALTON_ORDER_CACHE[key] = build_halton_order_1d(length, nb_point)
+    return _HALTON_ORDER_CACHE[key]
+
+def halton_schedule_target(step_idx: int, total_steps: int, total_positions: int, sched_pow: float = 1.0) -> int:
+    """
+    Determine how many positions should have been decoded after (step_idx + 1) steps.
+    """
+    if total_steps <= 1:
+        return total_positions
+    ratio = (step_idx + 1) / float(total_steps)
+    ratio = max(min(ratio, 1.0), 1e-6)
+    if sched_pow != 1.0:
+        ratio = ratio ** sched_pow
+    smooth = 1.0 - (math.acos(ratio) / (math.pi * 0.5))
+    target = int(smooth * total_positions)
+    target = max(step_idx + 1, target)
+    return min(total_positions, target)
+
+def format_method_label(method: str, semi_ar_block_size: int = None, halton_desc: str = None) -> str:
     if method == "semi_ar" and semi_ar_block_size is not None:
         return f"semi_ar ({semi_ar_block_size})"
+    if method == "halton" and halton_desc:
+        return f"halton ({halton_desc})"
     return method
 
-def method_file_prefix(method: str, semi_ar_block_size: int = None) -> str:
+def method_file_prefix(method: str, semi_ar_block_size: int = None, halton_tag: str = None) -> str:
     if method == "semi_ar" and semi_ar_block_size is not None:
         return f"semi_ar_bs{semi_ar_block_size}"
+    if method == "halton" and halton_tag:
+        return f"halton_{halton_tag}"
     return method
+
+def halton_method_strings(args) -> Tuple[str | None, str | None]:
+    if getattr(args, "method", None) != "halton":
+        return None, None
+    label_parts = [f"steps={args.halton_steps}"]
+    if args.halton_randomize:
+        label_parts.append("rand")
+    if args.halton_top_k > 0:
+        label_parts.append(f"topk={args.halton_top_k}")
+    if args.halton_temp_min != 1.0 or args.halton_temp_max != 1.0:
+        label_parts.append(f"T[{args.halton_temp_min:g},{args.halton_temp_max:g}]")
+    if args.halton_temp_pow != 1.0:
+        label_parts.append(f"pow={args.halton_temp_pow:g}")
+    label = ", ".join(label_parts)
+
+    tag_parts = [f"s{args.halton_steps}"]
+    if args.halton_randomize:
+        tag_parts.append("rand")
+    if args.halton_top_k > 0:
+        tag_parts.append(f"tk{args.halton_top_k}")
+    if args.halton_temp_pow != 1.0:
+        tag_parts.append(f"pow{args.halton_temp_pow:g}")
+    tag = "_".join(tag_parts)
+    return label or None, tag or None
 
 _SEMI_AR_BS_RE = re.compile(r"semi_ar_bs(\d+)")
 def parse_block_size_from_filename(path: str) -> int:
@@ -359,7 +595,8 @@ def run_worker(args):
     num_steps = args.num_steps if args.num_steps > 0 else gen_length
     if args.force_k1:
         num_steps = gen_length
-    method_label = format_method_label(args.method, args.semi_ar_block_size)
+    halton_desc, halton_tag = halton_method_strings(args)
+    method_label = format_method_label(args.method, args.semi_ar_block_size, halton_desc)
 
     os.makedirs(args.out_dir, exist_ok=True)
     result_rows: List[Dict[str, Any]] = []
@@ -385,6 +622,15 @@ def run_worker(args):
             "mode": "worker",
             "method": args.method,
             "semi_ar_block_size": args.semi_ar_block_size,
+            "halton_steps": args.halton_steps,
+            "halton_temp_min": args.halton_temp_min,
+            "halton_temp_max": args.halton_temp_max,
+            "halton_temp_pow": args.halton_temp_pow,
+            "halton_temp_warmup": args.halton_temp_warmup,
+            "halton_top_k": args.halton_top_k,
+            "halton_randomize": bool(args.halton_randomize),
+            "halton_sched_pow": args.halton_sched_pow,
+            "halton_nb_points": args.halton_nb_points,
             "model_name": args.model_name,
             "n": n,
             "trials_total": args.trials,
@@ -415,8 +661,12 @@ def run_worker(args):
             temperature = 0.0
         elif args.method == "confidence":
             temperature = 0.7
+        elif args.method == "margin":
+            temperature = 0.7
+        elif args.method == "halton":
+            temperature = 0.0
         else:
-            raise ValueError("--method must be 'ar', 'random', 'semi_ar', or 'confidence'")
+            raise ValueError("--method must be 'ar', 'random', 'semi_ar', 'confidence', 'margin', or 'halton'")
 
         correct_count_trial = 0
 
@@ -457,6 +707,36 @@ def run_worker(args):
                         block_eos=args.block_eos,
                         device=device,
                     )
+                elif args.method == "margin":
+                    full_ids, conf_order = generate_margin_decoding(
+                        model=model,
+                        prompt_ids=p_ids,
+                        attention_mask=p_attn,
+                        gen_length=gen_length,
+                        cfg_scale=args.cfg_scale,
+                        block_eos=args.block_eos,
+                        device=device,
+                    )
+                elif args.method == "halton":
+                    full_ids, halton_orders = generate_halton_decoding(
+                        model=model,
+                        prompt_ids=p_ids,
+                        attention_mask=p_attn,
+                        gen_length=gen_length,
+                        halton_steps=args.halton_steps,
+                        cfg_scale=args.cfg_scale,
+                        block_eos=args.block_eos,
+                        device=device,
+                        temp_min=args.halton_temp_min,
+                        temp_max=args.halton_temp_max,
+                        temp_pow=args.halton_temp_pow,
+                        temp_warmup=args.halton_temp_warmup,
+                        top_k=args.halton_top_k,
+                        randomize=args.halton_randomize,
+                        sched_pow=args.halton_sched_pow,
+                        nb_point=args.halton_nb_points,
+                    )
+                    conf_order = halton_orders[0]
                 else:
                     if perm_b is None:
                         raise RuntimeError("Permutation expected but not provided.")
@@ -491,12 +771,16 @@ def run_worker(args):
                     row["permutation"] = " ".join(map(str, perms[b].tolist()))
                 elif args.method == "confidence":
                     row["permutation"] = " ".join(map(str, conf_order))
+                elif args.method == "margin":
+                    row["permutation"] = " ".join(map(str, conf_order))
+                elif args.method == "halton":
+                    row["permutation"] = " ".join(map(str, conf_order))
                 else:
                     row["permutation"] = ""  # left-to-right implicit
                 if (
                     args.save_success_perms
                     and corr == 1
-                    and args.method in {"random", "semi_ar", "confidence"}
+                    and args.method in {"random", "semi_ar", "confidence", "margin", "halton"}
                 ):
                     success_lines.append(json.dumps({
                         "idx": batch_idxs[b],
@@ -507,7 +791,7 @@ def run_worker(args):
                 if (
                     args.save_failed_perms
                     and corr == 0
-                    and args.method in {"random", "semi_ar", "confidence"}
+                    and args.method in {"random", "semi_ar", "confidence", "margin", "halton"}
                 ):
                     failed_lines.append(json.dumps({
                         "idx": batch_idxs[b],
@@ -528,7 +812,7 @@ def run_worker(args):
         }, step=t)
 
     # Save shard outputs
-    fname_method = method_file_prefix(args.method, args.semi_ar_block_size)
+    fname_method = method_file_prefix(args.method, args.semi_ar_block_size, halton_tag)
     tag = f"{fname_method}_sh{args.trial_shard:02d}_of{args.num_shards:02d}"
     out_csv = os.path.join(args.out_dir, f"trials_{tag}.csv")
     pd.DataFrame(result_rows).to_csv(out_csv, index=False)
@@ -722,7 +1006,7 @@ def main():
 
     # Worker
     pw = sub.add_parser("worker", help="Run decoding trials on a shard")
-    pw.add_argument("--method", type=str, choices=["ar", "random", "semi_ar", "confidence"], required=True)
+    pw.add_argument("--method", type=str, choices=["ar", "random", "semi_ar", "confidence", "margin", "halton"], required=True)
     pw.add_argument("--model_name", type=str, default="GSAI-ML/LLaDA-8B-Instruct")
     pw.add_argument("--n", type=int, default=10, help="Number of problems to evaluate (default 10).")
     pw.add_argument("--gen_length", type=int, default=256)
@@ -735,6 +1019,24 @@ def main():
     pw.add_argument("--device", type=str, default="cuda")
     pw.add_argument("--semi_ar_block_size", type=int, default=16,
                     help="Block size used for semi-ar decoding (default: 16).")
+    pw.add_argument("--halton_steps", type=int, default=64,
+                    help="Number of Halton scheduling steps (default: 64).")
+    pw.add_argument("--halton_temp_min", type=float, default=1.0,
+                    help="Minimum Halton softmax temperature multiplier (default: 1.0).")
+    pw.add_argument("--halton_temp_max", type=float, default=1.0,
+                    help="Maximum Halton softmax temperature multiplier (default: 1.0).")
+    pw.add_argument("--halton_temp_pow", type=float, default=1.0,
+                    help="Exponent applied to Halton temperature schedule (default: 1.0).")
+    pw.add_argument("--halton_temp_warmup", type=int, default=0,
+                    help="Number of initial Halton steps using half temperature (default: 0).")
+    pw.add_argument("--halton_top_k", type=int, default=-1,
+                    help="Top-k sampling inside Halton updates (-1 disables).")
+    pw.add_argument("--halton_randomize", action="store_true",
+                    help="Randomly roll the Halton ordering per example.")
+    pw.add_argument("--halton_sched_pow", type=float, default=1.0,
+                    help="Power applied to Halton schedule progress (default: 1.0).")
+    pw.add_argument("--halton_nb_points", type=int, default=10_000,
+                    help="Number of points used to build the Halton ordering (default: 10k).")
 
     pw.add_argument("--trials", type=int, default=1024, help="Trials per problem.")
     pw.add_argument("--num_shards", type=int, default=1)
