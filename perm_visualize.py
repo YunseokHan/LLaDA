@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 
 _SEMI_AR_BS_TAG_RE = re.compile(r"semi_ar(?:_bs)?(\d+)")
 _SEMI_AR_LABEL_RE = re.compile(r"semi_ar\s*\((\d+)\)")
+_PERM_FILE_RE = re.compile(r"success_perms_([A-Za-z0-9_.-]+)_sh\d+_of\d+\.jsonl$")
 
 def format_method_label(method: str, block_size: int | None = None) -> str:
     if method == "semi_ar" and block_size is not None:
@@ -73,14 +74,53 @@ def extract_method_from_tag(tag: str) -> tuple[str | None, int | None]:
     label = normalize_method_label(base, block_hint)
     return label, block_hint
 
-def load_success_perms(in_dir: str):
+def normalize_method_key(tag: str) -> str:
+    if not tag:
+        return ""
+    if tag.startswith("semi_ar"):
+        return "semi_ar"
+    if tag.startswith("halton"):
+        return "halton"
+    if tag.startswith("conv"):
+        return "conv"
+    parts = tag.split("_", 1)
+    return parts[0]
+
+def parse_method_filter_args(values):
+    parsed = {}
+    if not values:
+        return parsed
+    for raw in values:
+        if "=" not in raw:
+            raise ValueError(f"Method filter '{raw}' must use format method=substring")
+        method, substr = raw.split("=", 1)
+        method = method.strip()
+        substr = substr.strip()
+        if not method or not substr:
+            raise ValueError(f"Invalid method filter entry: {raw}")
+        parsed.setdefault(method, []).append(substr)
+    return parsed
+
+def load_success_perms(in_dir: str, method_include=None, method_exclude=None):
     """results/raw/success_perms_*.jsonl 파일들을 모아 [dict,…] 리스트로 반환."""
+    method_include = method_include or {}
+    method_exclude = method_exclude or {}
     pattern = os.path.join(in_dir, "success_perms_*.jsonl")
     paths = sorted(glob.glob(pattern))
     items = []
     pattern_re = re.compile(r"success_perms_([a-zA-Z0-9_]+)_")
     for p in paths:
         base = os.path.basename(p)
+        method_key = ""
+        m_key = _PERM_FILE_RE.match(base)
+        if m_key:
+            method_key = normalize_method_key(m_key.group(1))
+        include_patterns = method_include.get(method_key, [])
+        if include_patterns and not any(s in base for s in include_patterns):
+            continue
+        exclude_patterns = method_exclude.get(method_key, [])
+        if exclude_patterns and any(s in base for s in exclude_patterns):
+            continue
         method_hint = None
         block_hint = None
         m = pattern_re.search(base)
@@ -143,11 +183,17 @@ def main():
                     help="Filter success permutations by method (e.g., random, margin, conv, halton).")
     ap.add_argument("--semi_ar_block_size", type=int, default=None,
                     help="Specify block size when --method semi_ar to disambiguate.")
+    ap.add_argument("--method_file_filter", action="append", default=[],
+                    help="Limit permutation JSONLs for specific methods, format method=substring (e.g., confidence=_of04).")
+    ap.add_argument("--method_file_exclude", action="append", default=[],
+                    help="Exclude permutation JSONLs for specific methods, format method=substring (e.g., confidence=_of08).")
     args = ap.parse_args()
 
     os.makedirs(args.out_dir, exist_ok=True)
 
-    items = load_success_perms(args.in_dir)
+    method_include = parse_method_filter_args(args.method_file_filter)
+    method_exclude = parse_method_filter_args(args.method_file_exclude)
+    items = load_success_perms(args.in_dir, method_include, method_exclude)
     total_items = len(items)
     method_filter = normalize_method_label(args.method, args.semi_ar_block_size)
     if args.method and method_filter is None:

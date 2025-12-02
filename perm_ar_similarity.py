@@ -17,6 +17,7 @@ import matplotlib.pyplot as plt
 
 _SEMI_AR_BS_TAG_RE = re.compile(r"semi_ar(?:_bs)?(\d+)")
 _SEMI_AR_LABEL_RE = re.compile(r"semi_ar\s*\((\d+)\)")
+_PERM_FILE_RE = re.compile(r"(success|failed)_perms_([A-Za-z0-9_.-]+)_sh\d+_of\d+\.jsonl$")
 
 def format_method_label(method: str, block_size: int | None = None) -> str:
     if method == "semi_ar" and block_size is not None:
@@ -80,7 +81,14 @@ def extract_method_from_tag(tag: str) -> tuple[str | None, int | None]:
     label = normalize_method_label(base, block_hint)
     return label, block_hint
 
-def load_perm_records(in_dir: str, statuses: List[str]) -> List[Dict[str, Any]]:
+def load_perm_records(
+    in_dir: str,
+    statuses: List[str],
+    method_include: Dict[str, List[str]] | None = None,
+    method_exclude: Dict[str, List[str]] | None = None,
+) -> List[Dict[str, Any]]:
+    method_include = method_include or {}
+    method_exclude = method_exclude or {}
     items: List[Dict[str, Any]] = []
     for status in statuses:
         pattern = os.path.join(in_dir, f"{status}_perms_*.jsonl")
@@ -88,6 +96,16 @@ def load_perm_records(in_dir: str, statuses: List[str]) -> List[Dict[str, Any]]:
         pattern_re = re.compile(rf"{status}_perms_([a-zA-Z0-9_]+)_")
         for path in paths:
             base = os.path.basename(path)
+            method_key = ""
+            m_key = _PERM_FILE_RE.match(base)
+            if m_key:
+                method_key = normalize_method_key(m_key.group(2))
+            include_patterns = method_include.get(method_key, [])
+            if include_patterns and not any(p in base for p in include_patterns):
+                continue
+            exclude_patterns = method_exclude.get(method_key, [])
+            if exclude_patterns and any(p in base for p in exclude_patterns):
+                continue
             method_hint = None
             block_hint = None
             m = pattern_re.search(base)
@@ -116,6 +134,33 @@ def load_perm_records(in_dir: str, statuses: List[str]) -> List[Dict[str, Any]]:
                     obj["status"] = status
                     items.append(obj)
     return items
+
+def normalize_method_key(tag: str) -> str:
+    if not tag:
+        return ""
+    if tag.startswith("semi_ar"):
+        return "semi_ar"
+    if tag.startswith("halton"):
+        return "halton"
+    if tag.startswith("conv"):
+        return "conv"
+    parts = tag.split("_", 1)
+    return parts[0]
+
+def parse_method_filter_args(values: List[str] | None) -> Dict[str, List[str]]:
+    parsed: Dict[str, List[str]] = {}
+    if not values:
+        return parsed
+    for raw in values:
+        if "=" not in raw:
+            raise ValueError(f"Method filter '{raw}' must use format method=substring")
+        method, substr = raw.split("=", 1)
+        method = method.strip()
+        substr = substr.strip()
+        if not method or not substr:
+            raise ValueError(f"Invalid method filter entry: {raw}")
+        parsed.setdefault(method, []).append(substr)
+    return parsed
 
 def parse_perm(s: str) -> np.ndarray:
     return np.fromstring(s, sep=" ", dtype=np.int32)
@@ -210,6 +255,10 @@ def main():
                     help="Which permutation outcomes to include.")
     ap.add_argument("--hist_bins", type=int, default=40, help="Histogram bins.")
     ap.add_argument("--seed", type=int, default=1234, help="Shuffle seed when sampling (unused currently).")
+    ap.add_argument("--method_file_filter", action="append", default=[],
+                    help="Limit permutation JSONLs for specific methods, format method=substring (e.g., confidence=_of04).")
+    ap.add_argument("--method_file_exclude", action="append", default=[],
+                    help="Exclude permutation JSONLs for specific methods, format method=substring (e.g., confidence=_of08).")
     args = ap.parse_args()
 
     if args.status == "both":
@@ -217,7 +266,10 @@ def main():
     else:
         statuses = [args.status]
 
-    items = load_perm_records(args.in_dir, statuses)
+    include_map = parse_method_filter_args(args.method_file_filter)
+    exclude_map = parse_method_filter_args(args.method_file_exclude)
+
+    items = load_perm_records(args.in_dir, statuses, include_map, exclude_map)
     if not items:
         raise FileNotFoundError(f"No permutation records (statuses={statuses}) found under {args.in_dir}")
 

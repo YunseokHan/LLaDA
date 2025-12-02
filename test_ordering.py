@@ -1101,6 +1101,59 @@ def infer_out_dir_from_in_dir(in_dir: str) -> str:
         root = "."
     return os.path.join(root, "final")
 
+_TRIAL_FILE_RE = re.compile(r"trials_([A-Za-z0-9_.-]+)_sh\d+_of\d+\.csv$")
+
+def normalize_method_key_from_tag(tag: str) -> str:
+    if not tag:
+        return ""
+    if tag.startswith("semi_ar"):
+        return "semi_ar"
+    if tag.startswith("halton"):
+        return "halton"
+    if tag.startswith("conv"):
+        return "conv"
+    parts = tag.split("_", 1)
+    return parts[0]
+
+def method_key_from_trials_path(path: str) -> str:
+    base = os.path.basename(path)
+    m = _TRIAL_FILE_RE.match(base)
+    if not m:
+        return ""
+    tag = m.group(1)
+    return normalize_method_key_from_tag(tag)
+
+def parse_method_filter_args(values: List[str] | None) -> Dict[str, List[str]]:
+    parsed: Dict[str, List[str]] = {}
+    if not values:
+        return parsed
+    for raw in values:
+        if "=" not in raw:
+            raise ValueError(f"Method filter '{raw}' must use format method=substring")
+        method, substr = raw.split("=", 1)
+        method = method.strip()
+        substr = substr.strip()
+        if not method or not substr:
+            raise ValueError(f"Invalid method filter entry: {raw}")
+        parsed.setdefault(method, []).append(substr)
+    return parsed
+
+def apply_trial_file_filters(files: List[str], include_map: Dict[str, List[str]], exclude_map: Dict[str, List[str]]) -> List[str]:
+    if not include_map and not exclude_map:
+        return files
+    kept: List[str] = []
+    for path in files:
+        method_key = method_key_from_trials_path(path)
+        base = os.path.basename(path)
+        include_patterns = include_map.get(method_key, [])
+        if include_patterns and not any(p in base for p in include_patterns):
+            continue
+        exclude_patterns = exclude_map.get(method_key, [])
+        if exclude_patterns and any(p in base for p in exclude_patterns):
+            continue
+        kept.append(path)
+    return kept
+
 def run_aggregate(args):
     if not args.out_dir:
         args.out_dir = infer_out_dir_from_in_dir(args.in_dir)
@@ -1111,6 +1164,16 @@ def run_aggregate(args):
     files = sorted(glob.glob(pattern))
     if not files:
         raise FileNotFoundError(f"No shard CSVs found under: {pattern}")
+
+    include_map = parse_method_filter_args(args.method_file_filter)
+    exclude_map = parse_method_filter_args(args.method_file_exclude)
+    if include_map or exclude_map:
+        filtered = apply_trial_file_filters(files, include_map, exclude_map)
+        if not filtered:
+            raise FileNotFoundError("No shard CSVs left after applying method filters.")
+        if len(filtered) != len(files):
+            print(f"[INFO] filtered shard CSVs: {len(files)} -> {len(filtered)}")
+        files = filtered
 
     dfs = [load_trials_with_method_labels(p) for p in files]
     df = pd.concat(dfs, ignore_index=True)
@@ -1250,6 +1313,10 @@ def main():
     pa.add_argument("--n", type=int, default=10, help="Number of problems included (safety).")
     # (optional) model name is only used for wandb group default
     pa.add_argument("--model_name", type=str, default="GSAI-ML/LLaDA-8B-Instruct")
+    pa.add_argument("--method_file_filter", action="append", default=[],
+                    help="Limit shard CSVs for specific methods, e.g., confidence=_of04. Format method=substring.")
+    pa.add_argument("--method_file_exclude", action="append", default=[],
+                    help="Exclude shard CSVs for specific methods, e.g., confidence=_of08.")
     add_wandb_args(pa)
 
     args = p.parse_args()

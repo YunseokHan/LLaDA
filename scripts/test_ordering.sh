@@ -2,6 +2,10 @@
 
 set -euo pipefail
 
+# Controls:
+#   LOG_DIR, RESULT_DIR, MODEL, JOB_ID ... (see below)
+#   AGG_METHOD_FILTERS="confidence=_of04;semi_ar=_bs16_sh03"  # apply multiple --method_file_filter flags
+#   AGG_METHOD_EXCLUDES="confidence=_of08"                    # apply --method_file_exclude flags
 LOG_DIR="${LOG_DIR:-logs/search_n100}"
 RESULT_DIR="${RESULT_DIR:-results_n100}"
 RAW_DIR="${RESULT_DIR}/raw"
@@ -37,6 +41,8 @@ CONV_EXTRA_ARGS="${CONV_EXTRA_ARGS:-}"    # extra CLI args for conv method
 
 SAFE_MODEL="${MODEL//\//_}"
 WANDB_GROUP="${WANDB_GROUP:-passk-${SAFE_MODEL}}"
+AGG_METHOD_FILTERS="${AGG_METHOD_FILTERS:-}"
+AGG_METHOD_EXCLUDES="${AGG_METHOD_EXCLUDES:-}"
 
 declare -a METHOD_ARGS=()
 GPU_ID_ARG=""
@@ -216,14 +222,34 @@ done
 # Aggregate
 # ================================
 echo "== Aggregate =="
-$PY $SCRIPT aggregate \
-  --in_dir "$OUT_DIR" --out_dir "$FINAL_DIR" \
-  --trials "$TRIALS" --n "$N_PROBLEMS" --model_name "$MODEL" \
-  --wandb_mode "$WANDB_MODE" \
-  --wandb_project "$WANDB_PROJECT" \
-  $( [[ -n "$WANDB_ENTITY" ]] && echo --wandb_entity "$WANDB_ENTITY" ) \
-  --wandb_group "$WANDB_GROUP" \
+agg_cmd=(
+  "$PY" "$SCRIPT" aggregate
+  --in_dir "$OUT_DIR" --out_dir "$FINAL_DIR"
+  --trials "$TRIALS" --n "$N_PROBLEMS" --model_name "$MODEL"
+  --wandb_mode "$WANDB_MODE"
+  --wandb_project "$WANDB_PROJECT"
+  --wandb_group "$WANDB_GROUP"
   --wandb_run_name "aggregate-${JOB_ID}_n${N_PROBLEMS}"
+)
+if [[ -n "$WANDB_ENTITY" ]]; then
+  agg_cmd+=(--wandb_entity "$WANDB_ENTITY")
+fi
+if [[ -n "$AGG_METHOD_FILTERS" ]]; then
+  IFS=';' read -ra agg_filters <<< "$AGG_METHOD_FILTERS"
+  for entry in "${agg_filters[@]}"; do
+    [[ -z "$entry" ]] && continue
+    agg_cmd+=(--method_file_filter "$entry")
+  done
+fi
+if [[ -n "$AGG_METHOD_EXCLUDES" ]]; then
+  IFS=';' read -ra agg_excl <<< "$AGG_METHOD_EXCLUDES"
+  for entry in "${agg_excl[@]}"; do
+    [[ -z "$entry" ]] && continue
+    agg_cmd+=(--method_file_exclude "$entry")
+  done
+fi
+echo "Running aggregate cmd: ${agg_cmd[*]}"
+"${agg_cmd[@]}"
 
 echo "== Outputs =="
 echo "  - Shard CSVs: $OUT_DIR/trials_*.csv"
