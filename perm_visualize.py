@@ -140,7 +140,7 @@ def main():
     ap.add_argument("--seed", type=int, default=1234)
     ap.add_argument("--dpi", type=int, default=200)
     ap.add_argument("--method", type=str, default=None,
-                    help="Filter success permutations by method (e.g., random, margin, halton).")
+                    help="Filter success permutations by method (e.g., random, margin, conv, halton).")
     ap.add_argument("--semi_ar_block_size", type=int, default=None,
                     help="Specify block size when --method semi_ar to disambiguate.")
     args = ap.parse_args()

@@ -19,6 +19,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 torch = None
+F = None
 load_dataset = None
 AutoTokenizer = None
 AutoModel = None
@@ -367,6 +368,118 @@ def generate_margin_decoding(
 
         return x, decode_order
 
+def add_gumbel_noise(logits: torch.Tensor, temperature: float) -> torch.Tensor:
+    if temperature <= 0.0:
+        return logits
+    eps = 1e-12
+    noise = torch.rand_like(logits, dtype=torch.float64)
+    noise = torch.clamp(noise, eps, 1.0 - eps)
+    gumbel = -torch.log(-torch.log(noise))
+    gumbel = gumbel.to(logits.dtype)
+    return logits + gumbel * temperature
+
+def get_num_transfer_tokens(mask_index: torch.Tensor, steps: int) -> torch.Tensor:
+    if torch is None:
+        raise RuntimeError("PyTorch is required to run decoding.")
+    steps = max(1, int(steps))
+    if mask_index.ndim != 2:
+        mask_index = mask_index.view(mask_index.size(0), -1)
+    mask_counts = mask_index.sum(dim=1, dtype=torch.int64)
+    base = mask_counts // steps
+    remainder = mask_counts % steps
+    num_transfer = base.unsqueeze(1).repeat(1, steps)
+    for b in range(mask_counts.size(0)):
+        r = int(remainder[b].item())
+        if r > 0:
+            num_transfer[b, :r] += 1
+    return num_transfer
+
+def generate_conv_decoding(
+    model,
+    prompt_ids: torch.Tensor,
+    attention_mask: torch.Tensor,
+    gen_length: int,
+    conv_steps: int,
+    conv_block_length: int,
+    conv_temperature: float = 0.0,
+    cfg_scale: float = 0.0,
+    block_eos: bool = False,
+    device: str = "cuda",
+    conv_remask: str = "low_confidence",
+    conv_mult: float = 1.0,
+):
+    if torch is None:
+        raise RuntimeError("PyTorch is required to run decoding.")
+    if F is None:
+        raise RuntimeError("torch.nn.functional is required for convolutional decoding.")
+    with torch.no_grad():
+        B, Lp = prompt_ids.shape
+        steps = max(1, conv_steps)
+        x = torch.full((B, Lp + gen_length), MASK_TOKEN_ID, dtype=torch.long, device=device)
+        x[:, :Lp] = prompt_ids
+        attn = torch.cat(
+            [attention_mask, torch.ones((B, gen_length), dtype=attention_mask.dtype, device=device)],
+            dim=-1
+        ) if attention_mask is not None else None
+
+        kernel_size = max(1, conv_block_length)
+        if kernel_size % 2 == 0:
+            kernel_size += 1
+        kernel = torch.ones(1, 1, kernel_size, device=device, dtype=torch.float32)
+        padding = (kernel_size - 1) // 2
+
+        block_mask_index = (x[:, Lp:] == MASK_TOKEN_ID)
+        transfer_counts = get_num_transfer_tokens(block_mask_index, steps)
+        decode_orders: List[List[int]] = [[] for _ in range(B)]
+        start = Lp
+
+        for step_idx in range(steps):
+            mask_index = (x == MASK_TOKEN_ID)
+            if not bool(mask_index[:, start:].any().item()):
+                break
+
+            logits = forward_logits(model, x, attn, cfg_scale=cfg_scale).float()
+            if block_eos:
+                logits[:, start:, EOS_TOKEN_ID] = -torch.inf
+                logits[:, start:, EOT_TOKEN_ID] = -torch.inf
+
+            logits_noised = add_gumbel_noise(logits, conv_temperature)
+            x0 = torch.argmax(logits_noised, dim=-1)
+
+            if conv_remask == "random":
+                x0_p = torch.rand((B, x.size(1)), device=device, dtype=torch.float32)
+            else:
+                probs = torch.softmax(logits, dim=-1)
+                x0_p = torch.gather(probs, dim=-1, index=x0.unsqueeze(-1)).squeeze(-1)
+
+            x0 = torch.where(mask_index, x0, x)
+            confidence = torch.full_like(x0_p, -torch.inf)
+            confidence[mask_index] = x0_p[mask_index]
+            confidence[:, :start] = -torch.inf
+
+            unmasked = (~mask_index).float().unsqueeze(1)
+            conv_scores = F.conv1d(unmasked, kernel, padding=padding).squeeze(1)
+            conv_scores = torch.tanh(conv_scores * conv_mult)
+            confidence[mask_index] = confidence[mask_index] * conv_scores[mask_index]
+
+            transfer_index = torch.zeros_like(x0, dtype=torch.bool)
+            for b in range(B):
+                k = int(transfer_counts[b, step_idx].item())
+                available = int(mask_index[b, start:].sum().item())
+                k = min(k, available)
+                if k <= 0:
+                    continue
+                vals, idx = torch.topk(confidence[b], k=k)
+                transfer_index[b, idx] = True
+
+            x[transfer_index] = x0[transfer_index]
+            newly_filled = transfer_index[:, start:]
+            nz = torch.nonzero(newly_filled, as_tuple=False)
+            for row, rel in nz:
+                decode_orders[int(row.item())].append(int(rel.item()))
+
+        return x, decode_orders
+
 def decode_generated_only(tokenizer, full_ids: torch.Tensor, prompt_len: int) -> List[str]:
     return tokenizer.batch_decode(full_ids[:, prompt_len:], skip_special_tokens=True)
 
@@ -451,18 +564,32 @@ def halton_schedule_target(step_idx: int, total_steps: int, total_positions: int
     target = max(step_idx + 1, target)
     return min(total_positions, target)
 
-def format_method_label(method: str, semi_ar_block_size: int = None, halton_desc: str = None) -> str:
+def format_method_label(
+    method: str,
+    semi_ar_block_size: int = None,
+    halton_desc: str = None,
+    conv_desc: str = None,
+) -> str:
     if method == "semi_ar" and semi_ar_block_size is not None:
         return f"semi_ar ({semi_ar_block_size})"
     if method == "halton" and halton_desc:
         return f"halton ({halton_desc})"
+    if method == "conv" and conv_desc:
+        return f"conv ({conv_desc})"
     return method
 
-def method_file_prefix(method: str, semi_ar_block_size: int = None, halton_tag: str = None) -> str:
+def method_file_prefix(
+    method: str,
+    semi_ar_block_size: int = None,
+    halton_tag: str = None,
+    conv_tag: str = None,
+) -> str:
     if method == "semi_ar" and semi_ar_block_size is not None:
         return f"semi_ar_bs{semi_ar_block_size}"
     if method == "halton" and halton_tag:
         return f"halton_{halton_tag}"
+    if method == "conv" and conv_tag:
+        return f"conv_{conv_tag}"
     return method
 
 def halton_method_strings(args) -> Tuple[str | None, str | None]:
@@ -487,6 +614,34 @@ def halton_method_strings(args) -> Tuple[str | None, str | None]:
     if args.halton_temp_pow != 1.0:
         tag_parts.append(f"pow{args.halton_temp_pow:g}")
     tag = "_".join(tag_parts)
+    return label or None, tag or None
+
+def conv_method_strings(args) -> Tuple[str | None, str | None]:
+    if getattr(args, "method", None) != "conv":
+        return None, None
+    desc_parts = []
+    if getattr(args, "conv_block_length", None):
+        desc_parts.append(f"blk={args.conv_block_length}")
+    desc_parts.append(f"steps={args.conv_steps}")
+    if args.conv_temperature > 0:
+        desc_parts.append(f"T={args.conv_temperature:g}")
+    if args.conv_remask and args.conv_remask != "low_confidence":
+        desc_parts.append(args.conv_remask)
+    if args.conv_mult != 1.0:
+        desc_parts.append(f"m{args.conv_mult:g}")
+    label = ", ".join(desc_parts)
+
+    tag_parts = []
+    if getattr(args, "conv_block_length", None):
+        tag_parts.append(f"blk{args.conv_block_length}")
+    tag_parts.append(f"s{args.conv_steps}")
+    if args.conv_temperature > 0:
+        tag_parts.append(f"t{args.conv_temperature:g}")
+    if args.conv_remask and args.conv_remask != "low_confidence":
+        tag_parts.append(args.conv_remask)
+    if args.conv_mult != 1.0:
+        tag_parts.append(f"m{args.conv_mult:g}")
+    tag = "_".join(tag_parts) if tag_parts else None
     return label or None, tag or None
 
 _SEMI_AR_BS_RE = re.compile(r"semi_ar_bs(\d+)")
@@ -550,12 +705,14 @@ def wandb_log_artifact(run, path: str, art_type: str, name: str = None):
 # Worker mode
 # =========================
 def run_worker(args):
-    global torch, load_dataset, AutoTokenizer, AutoModel
+    global torch, F, load_dataset, AutoTokenizer, AutoModel
     import torch as _torch
+    import torch.nn.functional as _F
     from datasets import load_dataset as _load_dataset
     from transformers import AutoTokenizer as _AutoTokenizer, AutoModel as _AutoModel
 
     torch = _torch
+    F = _F
     load_dataset = _load_dataset
     AutoTokenizer = _AutoTokenizer
     AutoModel = _AutoModel
@@ -596,7 +753,8 @@ def run_worker(args):
     if args.force_k1:
         num_steps = gen_length
     halton_desc, halton_tag = halton_method_strings(args)
-    method_label = format_method_label(args.method, args.semi_ar_block_size, halton_desc)
+    conv_desc, conv_tag = conv_method_strings(args)
+    method_label = format_method_label(args.method, args.semi_ar_block_size, halton_desc, conv_desc)
 
     os.makedirs(args.out_dir, exist_ok=True)
     result_rows: List[Dict[str, Any]] = []
@@ -631,6 +789,11 @@ def run_worker(args):
             "halton_randomize": bool(args.halton_randomize),
             "halton_sched_pow": args.halton_sched_pow,
             "halton_nb_points": args.halton_nb_points,
+            "conv_steps": args.conv_steps,
+            "conv_block_length": args.conv_block_length,
+            "conv_temperature": args.conv_temperature,
+            "conv_remask": args.conv_remask,
+            "conv_mult": args.conv_mult,
             "model_name": args.model_name,
             "n": n,
             "trials_total": args.trials,
@@ -663,10 +826,12 @@ def run_worker(args):
             temperature = 0.7
         elif args.method == "margin":
             temperature = 0.7
+        elif args.method == "conv":
+            temperature = 0.0
         elif args.method == "halton":
             temperature = 0.0
         else:
-            raise ValueError("--method must be 'ar', 'random', 'semi_ar', 'confidence', 'margin', or 'halton'")
+            raise ValueError("--method must be 'ar', 'random', 'semi_ar', 'confidence', 'margin', 'conv', or 'halton'")
 
         correct_count_trial = 0
 
@@ -717,6 +882,22 @@ def run_worker(args):
                         block_eos=args.block_eos,
                         device=device,
                     )
+                elif args.method == "conv":
+                    full_ids, conv_orders = generate_conv_decoding(
+                        model=model,
+                        prompt_ids=p_ids,
+                        attention_mask=p_attn,
+                        gen_length=gen_length,
+                        conv_steps=args.conv_steps,
+                        conv_block_length=args.conv_block_length,
+                        conv_temperature=args.conv_temperature,
+                        cfg_scale=args.cfg_scale,
+                        block_eos=args.block_eos,
+                        device=device,
+                        conv_remask=args.conv_remask,
+                        conv_mult=args.conv_mult,
+                    )
+                    conf_order = conv_orders[0]
                 elif args.method == "halton":
                     full_ids, halton_orders = generate_halton_decoding(
                         model=model,
@@ -773,6 +954,8 @@ def run_worker(args):
                     row["permutation"] = " ".join(map(str, conf_order))
                 elif args.method == "margin":
                     row["permutation"] = " ".join(map(str, conf_order))
+                elif args.method == "conv":
+                    row["permutation"] = " ".join(map(str, conf_order))
                 elif args.method == "halton":
                     row["permutation"] = " ".join(map(str, conf_order))
                 else:
@@ -780,7 +963,7 @@ def run_worker(args):
                 if (
                     args.save_success_perms
                     and corr == 1
-                    and args.method in {"random", "semi_ar", "confidence", "margin", "halton"}
+                    and args.method in {"random", "semi_ar", "confidence", "margin", "conv", "halton"}
                 ):
                     success_lines.append(json.dumps({
                         "idx": batch_idxs[b],
@@ -791,7 +974,7 @@ def run_worker(args):
                 if (
                     args.save_failed_perms
                     and corr == 0
-                    and args.method in {"random", "semi_ar", "confidence", "margin", "halton"}
+                    and args.method in {"random", "semi_ar", "confidence", "margin", "conv", "halton"}
                 ):
                     failed_lines.append(json.dumps({
                         "idx": batch_idxs[b],
@@ -812,21 +995,21 @@ def run_worker(args):
         }, step=t)
 
     # Save shard outputs
-    fname_method = method_file_prefix(args.method, args.semi_ar_block_size, halton_tag)
+    fname_method = method_file_prefix(args.method, args.semi_ar_block_size, halton_tag, conv_tag)
     tag = f"{fname_method}_sh{args.trial_shard:02d}_of{args.num_shards:02d}"
     out_csv = os.path.join(args.out_dir, f"trials_{tag}.csv")
     pd.DataFrame(result_rows).to_csv(out_csv, index=False)
     print(f"[DONE] wrote {len(result_rows)} rows to {out_csv}")
     wandb_log_artifact(run, out_csv, art_type="results", name=f"trials_{tag}")
 
-    if args.method in {"random", "semi_ar", "confidence"} and args.save_success_perms:
+    if args.method in {"random", "semi_ar", "confidence", "margin", "conv", "halton"} and args.save_success_perms:
         succ_path = os.path.join(args.out_dir, f"success_perms_{tag}.jsonl")
         with open(succ_path, "w", encoding="utf-8") as f:
             for line in success_lines:
                 f.write(line + "\n")
         print(f"[DONE] wrote successful permutations to {succ_path}")
         wandb_log_artifact(run, succ_path, art_type="metadata", name=f"success_perms_{tag}")
-    if args.method in {"random", "semi_ar", "confidence"} and args.save_failed_perms:
+    if args.method in {"random", "semi_ar", "confidence", "margin", "conv", "halton"} and args.save_failed_perms:
         fail_path = os.path.join(args.out_dir, f"failed_perms_{tag}.jsonl")
         with open(fail_path, "w", encoding="utf-8") as f:
             for line in failed_lines:
@@ -1006,7 +1189,7 @@ def main():
 
     # Worker
     pw = sub.add_parser("worker", help="Run decoding trials on a shard")
-    pw.add_argument("--method", type=str, choices=["ar", "random", "semi_ar", "confidence", "margin", "halton"], required=True)
+    pw.add_argument("--method", type=str, choices=["ar", "random", "semi_ar", "confidence", "margin", "conv", "halton"], required=True)
     pw.add_argument("--model_name", type=str, default="GSAI-ML/LLaDA-8B-Instruct")
     pw.add_argument("--n", type=int, default=10, help="Number of problems to evaluate (default 10).")
     pw.add_argument("--gen_length", type=int, default=256)
@@ -1037,13 +1220,25 @@ def main():
                     help="Power applied to Halton schedule progress (default: 1.0).")
     pw.add_argument("--halton_nb_points", type=int, default=10_000,
                     help="Number of points used to build the Halton ordering (default: 10k).")
+    pw.add_argument("--conv_steps", type=int, default=64,
+                    help="Number of convolutional decoding steps (default: 64).")
+    pw.add_argument("--conv_block_length", type=int, default=64,
+                    help="Context window (kernel size) used for convolutional confidence (default: 64).")
+    pw.add_argument("--conv_temperature", type=float, default=0.0,
+                    help="Gumbel noise temperature for convolutional decoding (default: 0.0).")
+    pw.add_argument("--conv_remask", type=str, choices=["low_confidence", "random"], default="low_confidence",
+                    help="Confidence estimate used to select tokens per convolutional step.")
+    pw.add_argument("--conv_mult", type=float, default=1.0,
+                    help="Scaling multiplier applied to convolutional context weights (default: 1.0).")
 
     pw.add_argument("--trials", type=int, default=1024, help="Trials per problem.")
     pw.add_argument("--num_shards", type=int, default=1)
     pw.add_argument("--trial_shard", type=int, default=0)
     pw.add_argument("--out_dir", type=str, default="results/raw")
-    pw.add_argument("--save_success_perms", action="store_true", help="Save successful permutations (random/semi_ar/confidence modes).")
-    pw.add_argument("--save_failed_perms", action="store_true", help="Save failed permutations (random/semi_ar/confidence modes).")
+    pw.add_argument("--save_success_perms", action="store_true",
+                    help="Save successful permutations (random/semi_ar/confidence/margin/conv/halton modes).")
+    pw.add_argument("--save_failed_perms", action="store_true",
+                    help="Save failed permutations (random/semi_ar/confidence/margin/conv/halton modes).")
     add_wandb_args(pw)
 
     # Aggregate

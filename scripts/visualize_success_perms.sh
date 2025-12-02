@@ -5,7 +5,7 @@ set -euo pipefail
 # Example helper to visualize successful permutations.
 # Customize via env vars:
 #   RESULT_DIR=/path/to/results_n100
-#   METHOD=semi_ar        # or margin/halton/random/confidence
+#   METHOD=semi_ar        # or margin/conv/halton/random/confidence
 #   SEMI_AR_BLOCK=32
 #   NUM_ROW=4
 #   SEED=42

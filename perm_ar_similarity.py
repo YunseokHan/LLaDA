@@ -201,7 +201,7 @@ def main():
     ap.add_argument("--final_out_dir", type=str, default=None,
                     help="Directory to write plots (default: sibling final/).")
     ap.add_argument("--methods", nargs="*", default=None,
-                    help="Optional list of methods to include (e.g., confidence random margin \"semi_ar (16)\" halton).")
+                    help="Optional list of methods to include (e.g., confidence random margin conv \"semi_ar (16)\" halton).")
     ap.add_argument("--semi_ar_block_size", type=int, default=None,
                     help="Block size hint used when filtering with method 'semi_ar'.")
     ap.add_argument("--csv_name", type=str, default="perm_ar_similarity_metrics.csv",

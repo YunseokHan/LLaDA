@@ -5,7 +5,7 @@ set -euo pipefail
 RESULT_DIR="${RESULT_DIR:-results_n100}"
 RAW_DIR="${RAW_DIR:-${RESULT_DIR}/raw}"
 FINAL_DIR="${FINAL_DIR:-${RESULT_DIR}/final}"
-METHODS="${METHODS:-confidence semi_ar margin halton}"
+METHODS="${METHODS:-confidence semi_ar margin conv halton}"
 INCLUDE_RANDOM="${INCLUDE_RANDOM:-1}"
 if [[ "$INCLUDE_RANDOM" == "1" && "$METHODS" != *"random"* ]]; then
   METHODS="${METHODS} random"

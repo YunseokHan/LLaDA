@@ -33,6 +33,7 @@ SEED=1234
 OUT_DIR="$RAW_DIR"
 SEMI_AR_BLOCKS="${SEMI_AR_BLOCKS:-8}"  # space-separated list
 HALTON_EXTRA_ARGS="${HALTON_EXTRA_ARGS:-}"  # extra CLI args for halton method
+CONV_EXTRA_ARGS="${CONV_EXTRA_ARGS:-}"    # extra CLI args for conv method
 
 SAFE_MODEL="${MODEL//\//_}"
 WANDB_GROUP="${WANDB_GROUP:-passk-${SAFE_MODEL}}"
@@ -52,8 +53,9 @@ while [[ $# -gt 0 ]]; do
     -h|--help)
       cat <<'USAGE'
 Usage: bash scripts/test_ordering.sh [--gpus ID0,ID1,...] [method ...]
-  methods: any of ar, random, semi_ar, confidence, margin, halton (default: semi_ar confidence)
+  methods: any of ar, random, semi_ar, confidence, margin, conv, halton (default: semi_ar confidence)
   For halton, you can supply HALTON_EXTRA_ARGS="--halton_steps 80 --halton_randomize" to tweak decoding.
+  For conv, provide CONV_EXTRA_ARGS="--conv_block_length 96 --conv_temperature 0.2" etc.
 USAGE
       exit 0
       ;;
@@ -129,7 +131,10 @@ run_method_sharded () {
     while (( idx < ${#extra_args[@]} )); do
       if [[ "${extra_args[idx]}" == "--semi_ar_block_size" && $((idx + 1)) -lt ${#extra_args[@]} ]]; then
         method_tag="${method_tag}_bs${extra_args[idx+1]}"
-        break
+      elif [[ "${extra_args[idx]}" == "--conv_block_length" && $((idx + 1)) -lt ${#extra_args[@]} ]]; then
+        method_tag="${method_tag}_blk${extra_args[idx+1]}"
+      elif [[ "${extra_args[idx]}" == "--conv_steps" && $((idx + 1)) -lt ${#extra_args[@]} ]]; then
+        method_tag="${method_tag}_s${extra_args[idx+1]}"
       fi
       idx=$((idx + 1))
     done
@@ -184,6 +189,14 @@ for raw_method in "${METHOD_ARGS[@]}"; do
     margin)
       run_method_sharded margin --save_success_perms --save_failed_perms
       ;;
+    conv)
+      conv_extra=()
+      if [[ -n "$CONV_EXTRA_ARGS" ]]; then
+        # shellcheck disable=SC2206
+        conv_extra=($CONV_EXTRA_ARGS)
+      fi
+      run_method_sharded conv --save_success_perms --save_failed_perms "${conv_extra[@]}"
+      ;;
     halton)
       halton_extra=()
       if [[ -n "$HALTON_EXTRA_ARGS" ]]; then
@@ -193,7 +206,7 @@ for raw_method in "${METHOD_ARGS[@]}"; do
       run_method_sharded halton --save_success_perms --save_failed_perms "${halton_extra[@]}"
       ;;
     *)
-      echo "[ERR] Unknown method '$raw_method'. Supported: ar, random, semi_ar, confidence, margin, halton." >&2
+      echo "[ERR] Unknown method '$raw_method'. Supported: ar, random, semi_ar, confidence, margin, conv, halton." >&2
       exit 1
       ;;
   esac
