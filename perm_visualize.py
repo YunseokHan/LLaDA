@@ -187,6 +187,8 @@ def main():
                     help="Limit permutation JSONLs for specific methods, format method=substring (e.g., confidence=_of04).")
     ap.add_argument("--method_file_exclude", action="append", default=[],
                     help="Exclude permutation JSONLs for specific methods, format method=substring (e.g., confidence=_of08).")
+    ap.add_argument("--show_title", action="store_true",
+                    help="Display a global title on the figure (default: off).")
     args = ap.parse_args()
 
     os.makedirs(args.out_dir, exist_ok=True)
@@ -231,11 +233,20 @@ def main():
             ax.set_ylabel("Token Position", fontsize=9)
 
     # 남는 칸은 없음(정확히 n*n 샘플)
-    if method_filter:
-        plt.suptitle(f"Successful permutations [{method_filter}] (random sample, {args.num_row}×{args.num_row})", fontsize=12)
+    if args.show_title:
+        if method_filter:
+            plt.suptitle(
+                f"Successful permutations [{method_filter}] (random sample, {args.num_row}×{args.num_row})",
+                fontsize=12,
+            )
+        else:
+            plt.suptitle(
+                f"Successful permutations (random sample, {args.num_row}×{args.num_row})",
+                fontsize=12,
+            )
+        plt.tight_layout(rect=[0, 0, 1, 0.97])
     else:
-        plt.suptitle(f"Successful permutations (random sample, {args.num_row}×{args.num_row})", fontsize=12)
-    plt.tight_layout(rect=[0, 0, 1, 0.97])
+        plt.tight_layout()
 
     method_tag = None
     if method_filter:

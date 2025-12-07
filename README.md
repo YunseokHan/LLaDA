@@ -191,4 +191,3 @@ Feel free to scan the WeChat QR code below to participate in the discussion and 
 <div style="display: flex; justify-content: center; flex-wrap: wrap;">
     <img src="./imgs/QR.JPG" style="width: 50%" />
 </div>
-
