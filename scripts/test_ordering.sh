@@ -35,7 +35,7 @@ BATCH=4
 CFG=0.0
 SEED=1234
 OUT_DIR="$RAW_DIR"
-SEMI_AR_BLOCKS="${SEMI_AR_BLOCKS:-8}"  # space-separated list
+SEMI_AR_BLOCKS="${SEMI_AR_BLOCKS:-32}"  # space-separated list
 HALTON_EXTRA_ARGS="${HALTON_EXTRA_ARGS:-}"  # extra CLI args for halton method
 CONV_EXTRA_ARGS="${CONV_EXTRA_ARGS:-}"    # extra CLI args for conv method
 
