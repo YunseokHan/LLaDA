@@ -10,17 +10,28 @@ ar,128,0.98
 ar,256,0.98
 ar,512,0.98
 ar,1024,0.99
-confidence,1,0.53
-confidence,2,0.53
-confidence,4,0.53
-confidence,8,0.53
-confidence,16,0.53
-confidence,32,0.53
-confidence,64,0.53
-confidence,128,0.53
-confidence,256,0.53
-confidence,512,0.53
-confidence,1024,0.53
+confidence,1,0.58
+confidence,2,0.58
+confidence,4,0.58
+confidence,8,0.58
+confidence,16,0.58
+confidence,32,0.58
+confidence,64,0.58
+confidence,128,0.58
+confidence,256,0.58
+confidence,512,0.58
+confidence,1024,0.58
+"conv (blk=64, steps=64)",1,0.79
+"conv (blk=64, steps=64)",2,0.79
+"conv (blk=64, steps=64)",4,0.79
+"conv (blk=64, steps=64)",8,0.79
+"conv (blk=64, steps=64)",16,0.79
+"conv (blk=64, steps=64)",32,0.79
+"conv (blk=64, steps=64)",64,0.79
+"conv (blk=64, steps=64)",128,0.79
+"conv (blk=64, steps=64)",256,0.79
+"conv (blk=64, steps=64)",512,0.79
+"conv (blk=64, steps=64)",1024,0.79
 random,1,0.52
 random,2,0.68
 random,4,0.78
